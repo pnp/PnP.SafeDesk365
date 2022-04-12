@@ -1,0 +1,491 @@
+﻿
+using PnP.Core.Model.Security;
+
+namespace SafeDesk365.Api.Bookings
+{
+    public class SPListBookingService : IBookingService
+    {
+        private readonly IPnPContextFactory pnpContextFactory;
+        private readonly IConfiguration configuration;
+        private readonly IFacilityService facilitiesService;
+        private readonly ILocationService locationService;
+        private readonly IDeskService deskService;
+
+        string listTitle;
+        string userColumn;
+        string deskCodeColumn;
+        string dateColumn;
+        string slotColumn;
+        string checkinColumn;
+        string checkoutColumn;
+        string locationColumn;
+
+        public SPListBookingService(IPnPContextFactory pnPContextFactory, IConfiguration configuration,
+            IFacilityService facilitiesService, ILocationService locationService, IDeskService deskService)
+        {
+            this.pnpContextFactory = pnPContextFactory;
+            this.configuration = configuration;
+            this.facilitiesService = facilitiesService;
+            this.locationService = locationService;
+            this.deskService = deskService;
+
+            #region SPListColumn Mappings
+            
+            listTitle = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:ListName");
+            userColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingUserColumn");
+            deskCodeColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:DeskCodeColumn");
+            dateColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingDateColumn");
+            slotColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingSlotColumn");
+            checkinColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingCheckinColumn");
+            checkoutColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingCheckoutColumn");
+            locationColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingLocationColumn");
+            #endregion
+
+        }
+        public async Task<int> Create(Booking? booking)
+        {
+            List<Desk> desks = await deskService.GetAll();
+            var locations = await locationService.GetAll();
+            var facilities = await facilitiesService.GetAll();
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                Dictionary<string, object> values = new();
+
+                var itemTitle = booking.Title != "" ? booking.Title : booking.DeskCode
+                    + "-" + booking.Date.ToShortDateString() + "-" + booking.TimeSlot;
+
+                IField userField = myList.Fields.AsRequested().FirstOrDefault(f => f.InternalName == userColumn);
+                var myUser = await context.Web.EnsureUserAsync(booking.User);
+                var locationId = locations.First(l => l.Name.Equals(booking.Location)).Id;
+
+                values.Add("Title",itemTitle);
+                values.Add(deskCodeColumn, booking.DeskCode);
+                values.Add(dateColumn, booking.Date);
+                values.Add(slotColumn, booking.TimeSlot);
+                values.Add(userColumn, userField.NewFieldUserValue(myUser));
+                values.Add(locationColumn, locationId);
+
+                var addedItem = await myList.Items.AddAsync(values);
+
+                return addedItem.Id;
+            }
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                var item = myList.Items.GetById(id);
+                await item.DeleteAsync();
+                return true;
+            }
+        }
+
+        public async Task<List<Booking>> GetAll()
+        {
+            var result = new List<Booking>();
+
+            var facilities = await facilitiesService.GetAll();
+            var locations = await locationService.GetAll();
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title, p => p.Items,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                foreach (var item in myList.Items)
+                {
+                    var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
+                    ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
+                    
+                    Booking booking = GetBooking(facilities, locations, item, user);
+                    result.Add(booking);
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<List<Booking>> GetUpcoming()
+        {
+            var result = new List<Booking>();
+
+            var facilities = await facilitiesService.GetAll();
+            var locations = await locationService.GetAll();
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                string viewXml = GetAllUpcomingQuery();
+
+                var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
+                {
+                    ViewXml = viewXml,
+                    DatesInUtc = true,
+                    RenderOptions = RenderListDataOptionsFlags.ListData
+                });
+
+                foreach (var item in myList.Items.AsRequested())
+                {
+                    var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
+                    ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
+
+                    Booking booking = GetBooking(facilities, locations, item, user);
+                    result.Add(booking);
+                }
+            }
+
+            return result;
+        }
+                   
+        public Task<List<Booking>> GetAllForUser(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Booking> GetById(int id)
+        {
+            Booking result;
+
+            var facilities = await facilitiesService.GetAll();
+            var locations = await locationService.GetAll();
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                var item = myList.Items.GetById(id);                
+
+                var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
+                ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
+                result = GetBooking(facilities, locations, item, user);
+            }
+
+            return result;
+        }
+
+        public void Update(Booking booking)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Booking> CheckInById(int id)
+        {
+            var result = new Booking();
+
+            var facilities = await facilitiesService.GetAll();
+            var locations = await locationService.GetAll();
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+                
+                var item = myList.Items.GetById(id);
+                item[checkinColumn]=DateTime.Now;
+                await item.UpdateAsync();
+
+                var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
+                ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
+                result = GetBooking(facilities, locations, item, user);
+            }
+
+            return result;
+        }
+
+        public async Task<Booking> CheckOutById(int id)
+        {
+            var result = new Booking();
+
+            var facilities = await facilitiesService.GetAll();
+            var locations = await locationService.GetAll();
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                var item = myList.Items.GetById(id);
+                item[checkoutColumn] = DateTime.Now;
+                await item.UpdateAsync();
+
+                var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
+                ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
+                result = GetBooking(facilities, locations, item, user);
+            }
+
+            return result;
+        }
+        private Booking GetBooking(List<Facility> facilities, List<Location> locations, IListItem item, ISharePointUser user)
+        {
+            List<string> timeSlotList = (List<string>)item.Values[slotColumn];
+
+            var booking = new Booking()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                CheckInTime = item.Values[checkinColumn] == null ? new DateTime(1900,1,1) : (DateTime)item.Values[checkinColumn],
+                CheckOutTime = item.Values[checkoutColumn] == null ? new DateTime(1900, 1, 1) : (DateTime)item.Values[checkoutColumn],
+                Date = (DateTime)item.Values[dateColumn],
+                DeskCode = (string)item.Values[deskCodeColumn],
+                TimeSlot = timeSlotList[0],
+                User = user.Mail,
+                Location = locations.First(l => l.Id.Equals((item[locationColumn] as IFieldLookupValue).LookupId)).Name
+            };
+
+            return booking;
+        }
+
+        private string GetByIdQuery(int id)
+        {            
+            return $@"<View>
+                        <ViewFields>
+                          <FieldRef Name='Title' />
+                          <FieldRef Name='{userColumn}' />
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{dateColumn}' />
+                          <FieldRef Name='{checkinColumn}' />
+                          <FieldRef Name='{slotColumn}' />
+                          <FieldRef Name='{checkoutColumn}' />                          
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{locationColumn}' />   
+                        </ViewFields>
+                        <Query>
+                          <Where>
+                            <Eq>
+                              <FieldRef Name='ID' LookupId='TRUE'/>
+                              <Value Type='Text'>{id}</Value>
+                            </Eq>
+                          </Where>
+                        </Query>
+                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
+                        <RowLimit>500</RowLimit>
+                        </View>";
+        }
+        private string GetAllUpcomingQuery()
+        {
+            string dateFormatted = DateTime.Now.ToString("s");
+
+            return $@"<View>
+                        <ViewFields>
+                          <FieldRef Name='Title' />
+                          <FieldRef Name='{userColumn}' />
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{dateColumn}' />
+                          <FieldRef Name='{checkinColumn}' />
+                          <FieldRef Name='{slotColumn}' />
+                          <FieldRef Name='{checkoutColumn}' />                          
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{locationColumn}' />  
+                        </ViewFields>
+                        <Query>
+                          <Where>
+                            <Geq>
+                              <FieldRef Name='{dateColumn}'/>
+                              <Value Type='DateTime' IncludeTimeValue='FALSE'>{dateFormatted}</Value>
+                            </Geq>
+                          </Where>
+                        </Query>
+                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
+                        <RowLimit>500</RowLimit>
+                        </View>";
+        }
+        private string GetAllUpcomingByLocationIdQuery(int locationId)
+        {
+            string dateFormatted = DateTime.Now.ToString("s");
+
+            return $@"<View>
+                        <ViewFields>
+                          <FieldRef Name='Title' />
+                          <FieldRef Name='{userColumn}' />
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{dateColumn}' />
+                          <FieldRef Name='{checkinColumn}' />
+                          <FieldRef Name='{slotColumn}' />
+                          <FieldRef Name='{checkoutColumn}' />                          
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{locationColumn}' />  
+                        </ViewFields>
+                        <Query>
+                          <Where>
+                            <And>
+                            <Geq>
+                              <FieldRef Name='{dateColumn}'/>
+                              <Value Type='DateTime' IncludeTimeValue='FALSE'>{dateFormatted}</Value>
+                            </Geq>
+                            <Eq>
+                              <FieldRef Name='{locationColumn}'/>
+                              <Value Type='Lookup'>{locationId}</Value>
+                            </Eq>
+                            </And>
+                          </Where>
+                        </Query>
+                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
+                        <RowLimit>100</RowLimit>
+                        </View>";
+        }
+        private string GetAllByLocationIdQuery(int locationId)
+        {
+            string dateFormatted = DateTime.Now.ToString("s");
+
+            return $@"<View>
+                        <ViewFields>
+                          <FieldRef Name='Title' />
+                          <FieldRef Name='{userColumn}' />
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{dateColumn}' />
+                          <FieldRef Name='{checkinColumn}' />
+                          <FieldRef Name='{slotColumn}' />
+                          <FieldRef Name='{checkoutColumn}' />                          
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{locationColumn}' />  
+
+                        </ViewFields>
+                        <Query>
+                          <Where>                            
+                            <Eq>
+                              <FieldRef Name='{locationColumn}'/>
+                              <Value Type='Lookup'>{locationId}</Value>
+                            </Eq>                            
+                          </Where>
+                        </Query>
+                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
+                        <RowLimit>100</RowLimit>
+                        </View>";
+        }
+        private string GetUpcomingByUserIdQuery(int locationId, int userId)
+        {
+            string dateFormatted = DateTime.Now.ToString("s");
+
+            return $@"<View>
+                        <ViewFields>
+                          <FieldRef Name='Title' />
+                          <FieldRef Name='{userColumn}' />
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{dateColumn}' />
+                          <FieldRef Name='{checkinColumn}' />
+                          <FieldRef Name='{slotColumn}' />
+                          <FieldRef Name='{checkoutColumn}' />                          
+                          <FieldRef Name='{deskCodeColumn}' /> 
+                          <FieldRef Name='{locationColumn}' />
+                        </ViewFields>
+                        <Query>
+                          <Where>
+                            <And>
+                            <Geq>
+                              <FieldRef Name='{dateColumn}'/>
+                              <Value Type='DateTime' IncludeTimeValue='FALSE'>{dateFormatted}</Value>
+                            </Geq>                                
+                            <Eq>
+                              <FieldRef Name='{userColumn}' LookupId='TRUE'/>
+                              <Value Type='Lookup'>{userId}</Value>
+                            </Eq>                                
+                            </And>
+                          </Where>
+                        </Query>
+                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
+                        <RowLimit>100</RowLimit>
+                        </View>";
+        }
+        private string GetUpcomingByLocationIdAndUserIdQuery(int locationId, int userId)
+        {
+            string dateFormatted = DateTime.Now.ToString("s");
+
+            return $@"<View>
+                        <ViewFields>
+                          <FieldRef Name='Title' />
+                          <FieldRef Name='{userColumn}' />
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{dateColumn}' />
+                          <FieldRef Name='{checkinColumn}' />
+                          <FieldRef Name='{slotColumn}' />
+                          <FieldRef Name='{checkoutColumn}' />                          
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{locationColumn}' />
+                        </ViewFields>
+                        <Query>
+                          <Where>
+                            <And>
+                            <Geq>
+                              <FieldRef Name='{dateColumn}'/>
+                              <Value Type='DateTime' IncludeTimeValue='FALSE'>{dateFormatted}</Value>
+                            </Geq>
+                                <And>
+                                <Eq>
+                                  <FieldRef Name='{locationColumn}'/>
+                                  <Value Type='Lookup'>{locationId}</Value>
+                                </Eq>
+                                <Eq>
+                                  <FieldRef Name='{userColumn}' LookupId='TRUE'/>
+                                  <Value Type='Lookup'>{userId}</Value>
+                                </Eq>
+                                </And>
+                            </And>
+                          </Where>
+                        </Query>
+                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
+                        <RowLimit>100</RowLimit>
+                        </View>";
+        }
+
+    }
+}

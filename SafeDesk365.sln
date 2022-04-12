@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SafeDesk365.DesignPoCWebApp", "SafeDesk365.DesignPoCWebApp\SafeDesk365.DesignPoCWebApp.csproj", "{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SafeDesk365.SDK", "SafeDesk365.SDK\SafeDesk365.SDK.csproj", "{FF21F8C6-D11A-4959-B0E4-99408C99376F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SafeDesk365.Api", "SafeDesk365.Api\SafeDesk365.Api.csproj", "{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafeDesk365.TestConsole", "SafeDesk365.TestConsole\SafeDesk365.TestConsole\SafeDesk365.TestConsole.csproj", "{B66368A8-6FDB-44DC-B437-8E098FF2CA10}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F9416DCD-7603-4F63-A5DD-AA617E6F94B0}
+	EndGlobalSection
+EndGlobal

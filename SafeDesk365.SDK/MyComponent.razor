@@ -1,0 +1,14 @@
+﻿<h3>MyComponent</h3>
+
+<RadzenButton Text="@text" Click="@ButtonClicked"></RadzenButton>
+@code {
+
+    string text = "Hi";
+
+    void ButtonClicked()
+    {
+        text = "huhu";
+        StateHasChanged();
+    }
+
+}

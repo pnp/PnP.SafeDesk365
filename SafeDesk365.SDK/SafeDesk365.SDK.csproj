@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>0.0.1-alpha</Version>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.2" />
+    <PackageReference Include="Microsoft.Kiota.Abstractions" Version="1.0.0-preview.4" />
+    <PackageReference Include="Microsoft.Kiota.Serialization.Json" Version="1.0.0-preview.2" />
+    <PackageReference Include="Microsoft.Kiota.Serialization.Text" Version="1.0.0-preview.1" />
+    <PackageReference Include="Radzen.Blazor" Version="3.17.3" />
+  </ItemGroup>
+
+</Project>
