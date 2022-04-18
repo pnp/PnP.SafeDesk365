@@ -20,6 +20,7 @@ namespace SafeDesk365.Api.Bookings
         string checkinColumn;
         string checkoutColumn;
         string locationColumn;
+        int rowlimit = 0;
 
         public SPListBookingService(IPnPContextFactory pnpContextFactory, IConfiguration configuration,
             IFacilityService facilitiesService, ILocationService locationService, IDeskService deskService,
@@ -44,6 +45,7 @@ namespace SafeDesk365.Api.Bookings
             checkinColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingCheckinColumn");
             checkoutColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingCheckoutColumn");
             locationColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingLocationColumn");
+            rowlimit = configuration.GetValue<int>("SafeDesk365:Lists:Bookings:RowLimit");
 
             #endregion
 
@@ -148,39 +150,7 @@ namespace SafeDesk365.Api.Bookings
             }
         }
 
-        public async Task<List<Booking>> GetAll()
-        {
-            var result = new List<Booking>();
-
-            var facilities = await facilitiesService.GetAll();
-            var locations = await locationService.GetAll();
-
-            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
-            {
-                var myList = context
-                        .Web
-                        .Lists
-                        .GetByTitle(listTitle,
-                            p => p.Title, p => p.Items,
-                            p => p.Fields.QueryProperties(p => p.InternalName,
-                            p => p.FieldTypeKind,
-                            p => p.TypeAsString,
-                            p => p.Title));
-
-                foreach (var item in myList.Items)
-                {
-                    var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
-                    ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
-                    
-                    Booking booking = GetBooking(facilities, locations, item, user);
-                    result.Add(booking);
-                }
-            }
-
-            return result;
-        }
-
-        public async Task<List<Booking>> GetUpcoming()
+        public async Task<List<Booking>> GetBookings(BookingQueryType type, string email = "", string location = "")
         {
             var result = new List<Booking>();
 
@@ -199,7 +169,13 @@ namespace SafeDesk365.Api.Bookings
                             p => p.TypeAsString,
                             p => p.Title));
 
-                string viewXml = GetQueryAllUpcoming();
+                string viewXml = "";
+
+                if(type == BookingQueryType.All)
+                    viewXml = await GetAllQueryString(email, location, locations, context);
+
+                if (type == BookingQueryType.Upcoming)
+                    viewXml = await GetUpcomingQueryString(email, location, locations, context);
 
                 var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
                 {
@@ -220,132 +196,7 @@ namespace SafeDesk365.Api.Bookings
 
             return result;
         }
-                   
-        public async Task<List<Booking>> GetAllByUser(string email)
-        {
-            var result = new List<Booking>();
-
-            var facilities = await facilitiesService.GetAll();
-            var locations = await locationService.GetAll();
-
-            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
-            {
-                var myList = context
-                        .Web
-                        .Lists
-                        .GetByTitle(listTitle,
-                            p => p.Title,
-                            p => p.Fields.QueryProperties(p => p.InternalName,
-                            p => p.FieldTypeKind,
-                            p => p.TypeAsString,
-                            p => p.Title));
-
-                var myUser = await context.Web.EnsureUserAsync(email);                
-                string viewXml = GetQueryAllByUserId(myUser.Id);
-
-                var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
-                {
-                    ViewXml = viewXml,
-                    DatesInUtc = true,
-                    RenderOptions = RenderListDataOptionsFlags.ListData
-                });
-
-                foreach (var item in myList.Items.AsRequested())
-                {
-                    var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
-                    ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
-
-                    Booking booking = GetBooking(facilities, locations, item, user);
-                    result.Add(booking);
-                }
-            }
-
-            return result;
-        }
-
-        public async Task<List<Booking>> GetAllByLocation(string location)
-        {
-            var result = new List<Booking>();
-
-            var facilities = await facilitiesService.GetAll();
-            var locations = await locationService.GetAll();
-
-            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
-            {
-                var myList = context
-                        .Web
-                        .Lists
-                        .GetByTitle(listTitle,
-                            p => p.Title,
-                            p => p.Fields.QueryProperties(p => p.InternalName,
-                            p => p.FieldTypeKind,
-                            p => p.TypeAsString,
-                            p => p.Title));
-
-                int locationId = locations.First(l => l.Name.ToLower().Equals(location.ToLower())).Id;
-                string viewXml = GetQueryAllByLocationId(locationId);
-
-                var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
-                {
-                    ViewXml = viewXml,
-                    RenderOptions = RenderListDataOptionsFlags.ListData
-                });
-
-                foreach (var item in myList.Items.AsRequested())
-                {
-                    var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
-                    ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
-
-                    Booking booking = GetBooking(facilities, locations, item, user);
-                    result.Add(booking);
-                }
-            }
-
-            return result;
-        }
-
-        public async Task<List<Booking>> GetUpcomingByUser(string email)
-        {
-            var result = new List<Booking>();
-
-            var facilities = await facilitiesService.GetAll();
-            var locations = await locationService.GetAll();
-
-            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
-            {
-                var myList = context
-                        .Web
-                        .Lists
-                        .GetByTitle(listTitle,
-                            p => p.Title,
-                            p => p.Fields.QueryProperties(p => p.InternalName,
-                            p => p.FieldTypeKind,
-                            p => p.TypeAsString,
-                            p => p.Title));
-
-                var myUser = await context.Web.EnsureUserAsync(email);
-                string viewXml = GetQueryUpcomingByUserId(myUser.Id);
-
-                var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
-                {
-                    ViewXml = viewXml,
-                    DatesInUtc = true,
-                    RenderOptions = RenderListDataOptionsFlags.ListData
-                });
-
-                foreach (var item in myList.Items.AsRequested())
-                {
-                    var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
-                    ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
-
-                    Booking booking = GetBooking(facilities, locations, item, user);
-                    result.Add(booking);
-                }
-            }
-
-            return result;
-        }
-
+        
         public async Task<Booking> GetById(int id)
         {
             Booking result;
@@ -374,7 +225,7 @@ namespace SafeDesk365.Api.Bookings
 
             return result;
         }
-
+        
         public void Update(Booking booking)
         {
             throw new NotImplementedException();
@@ -441,6 +292,7 @@ namespace SafeDesk365.Api.Bookings
 
             return result;
         }
+        
         private Booking GetBooking(List<Facility> facilities, List<Location> locations, IListItem item, ISharePointUser user)
         {
             List<string> timeSlotList = (List<string>)item.Values[slotColumn];
@@ -461,38 +313,70 @@ namespace SafeDesk365.Api.Bookings
             return booking;
         }
 
-        private string GetQueryById(int id)
-        {            
-            return $@"<View>
-                        <ViewFields>
-                          <FieldRef Name='Title' />
-                          <FieldRef Name='{userColumn}' />
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{dateColumn}' />
-                          <FieldRef Name='{checkinColumn}' />
-                          <FieldRef Name='{slotColumn}' />
-                          <FieldRef Name='{checkoutColumn}' />                          
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{locationColumn}' />   
-                        </ViewFields>
-                        <Query>
-                          <Where>
-                            <Eq>
-                              <FieldRef Name='ID' LookupId='TRUE'/>
-                              <Value Type='Text'>{id}</Value>
-                            </Eq>
-                          </Where>
-                        </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>500</RowLimit>
-                        </View>";
-        }
-        private string GetQueryAllUpcoming()
+        private async Task<string> GetAllQueryString(string email, string location, List<Location> locations, PnPContext context)
         {
-            string dateFormatted = DateTime.Now.ToString("s");
+            string viewXml = "";
 
-            return $@"<View>
-                        <ViewFields>
+            if (email == "" && location == "")
+                viewXml = GetQueryAll();
+
+            if (email != "" && location == "")
+            {
+                var myUser = await context.Web.EnsureUserAsync(email);
+                viewXml = GetQueryAllByUserId(myUser.Id);
+            }
+
+            if (location != "" && email == "")
+            {
+                int locationId = locations.First(l => l.Name.ToLower().Equals(location.ToLower())).Id;
+                viewXml = GetQueryAllByLocationId(locationId);
+            }
+
+            if (email != "" && location != "")
+            {
+                var myUser = await context.Web.EnsureUserAsync(email);
+                int locationId = locations.First(l => l.Name.ToLower().Equals(location.ToLower())).Id;
+                viewXml = GetQueryAllByLocationAndUserId(locationId, myUser.Id);
+            }
+
+            return viewXml;
+        }
+
+        private async Task<string> GetUpcomingQueryString(string email, string location, List<Location> locations, PnPContext context)
+        {
+            string viewXml = "";
+
+            if (email == "" && location == "")
+                viewXml = GetQueryUpcoming();
+
+            if (email != "" && location == "")
+            {
+                var myUser = await context.Web.EnsureUserAsync(email);
+                viewXml = GetQueryUpcomingByUserId(myUser.Id);
+            }
+
+            if (location != "" && email == "")
+            {
+                int locationId = locations.First(l => l.Name.ToLower().Equals(location.ToLower())).Id;
+                viewXml = GetQueryUpcomingByLocationId(locationId);
+            }
+
+            if (email != "" && location != "")
+            {
+                var myUser = await context.Web.EnsureUserAsync(email);
+                int locationId = locations.First(l => l.Name.ToLower().Equals(location.ToLower())).Id;
+                viewXml = GetQueryUpcomingByLocationIdAndUserId(locationId, myUser.Id);
+            }
+
+            return viewXml;
+        }
+
+
+        #region GetQueryStrings
+
+        private string GetViewFields()
+        {
+            return $@"<ViewFields>
                           <FieldRef Name='Title' />
                           <FieldRef Name='{userColumn}' />
                           <FieldRef Name='{deskCodeColumn}' />
@@ -502,94 +386,43 @@ namespace SafeDesk365.Api.Bookings
                           <FieldRef Name='{checkoutColumn}' />                          
                           <FieldRef Name='{deskCodeColumn}' />
                           <FieldRef Name='{locationColumn}' />  
-                        </ViewFields>
-                        <Query>
-                          <Where>
-                            <Geq>
-                              <FieldRef Name='{dateColumn}'/>
-                              <Value Type='DateTime' IncludeTimeValue='FALSE'>{dateFormatted}</Value>
-                            </Geq>
-                          </Where>
-                        </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>500</RowLimit>
-                        </View>";
+                        </ViewFields>";
         }
-        private string GetQueryAllUpcomingByLocationId(int locationId)
+        private string GetOrderByAndRowLimit()
         {
-            string dateFormatted = DateTime.Now.ToString("s");
-
+            return $@"<OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
+                      <RowLimit>{rowlimit}</RowLimit>";
+        }
+        private string GetQueryAll()
+        {
             return $@"<View>
-                        <ViewFields>
-                          <FieldRef Name='Title' />
-                          <FieldRef Name='{userColumn}' />
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{dateColumn}' />
-                          <FieldRef Name='{checkinColumn}' />
-                          <FieldRef Name='{slotColumn}' />
-                          <FieldRef Name='{checkoutColumn}' />                          
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{locationColumn}' />  
-                        </ViewFields>
+                        {GetViewFields()}
                         <Query>
                           <Where>
-                            <And>
-                            <Geq>
-                              <FieldRef Name='{dateColumn}'/>
-                              <Value Type='DateTime' IncludeTimeValue='FALSE'>{dateFormatted}</Value>
-                            </Geq>
-                            <Eq>
-                              <FieldRef Name='{locationColumn}'/>
-                              <Value Type='Lookup'>{locationId}</Value>
-                            </Eq>
-                            </And>
                           </Where>
                         </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>100</RowLimit>
+                        {GetOrderByAndRowLimit()}
                         </View>";
         }
         private string GetQueryAllByLocationId(int locationId)
         {            
             return $@"<View>
-                        <ViewFields>
-                          <FieldRef Name='Title' />
-                          <FieldRef Name='{userColumn}' />
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{dateColumn}' />
-                          <FieldRef Name='{checkinColumn}' />
-                          <FieldRef Name='{slotColumn}' />
-                          <FieldRef Name='{checkoutColumn}' />                          
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{locationColumn}' />  
-                        </ViewFields>
+                        {GetViewFields()}
                         <Query>
                           <Where>                            
                             <Eq>
-                              <FieldRef Name='{locationColumn}'/>
+                              <FieldRef Name='{locationColumn}' LookupId='TRUE'/>
                               <Value Type='Lookup'>{locationId}</Value>
                             </Eq>                            
                           </Where>
                         </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>100</RowLimit>
+                        {GetOrderByAndRowLimit()}
                         </View>";
         }
-
         private string GetQueryAllByUserId(int userId)
         {            
             return $@"<View>
-                        <ViewFields>
-                          <FieldRef Name='Title' />
-                          <FieldRef Name='{userColumn}' />
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{dateColumn}' />
-                          <FieldRef Name='{checkinColumn}' />
-                          <FieldRef Name='{slotColumn}' />
-                          <FieldRef Name='{checkoutColumn}' />                          
-                          <FieldRef Name='{deskCodeColumn}' /> 
-                          <FieldRef Name='{locationColumn}' />
-                        </ViewFields>
+                        {GetViewFields()}
                         <Query>
                           <Where>                                                            
                             <Eq>
@@ -598,27 +431,53 @@ namespace SafeDesk365.Api.Bookings
                             </Eq>                                                            
                           </Where>
                         </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>100</RowLimit>
+                        {GetOrderByAndRowLimit()}
                         </View>";
         }
+        private string GetQueryAllByLocationAndUserId(int locationId, int userId)
+        {
+            return $@"<View>
+                        {GetViewFields()}
+                        <Query>
+                          <Where>
+                            <And>
+                                <Eq>
+                                  <FieldRef Name='{userColumn}' LookupId='TRUE'/>
+                                  <Value Type='Lookup'>{userId}</Value>
+                                </Eq>
+                                <Eq>
+                                  <FieldRef Name='{locationColumn}' LookupId='TRUE'/>
+                                  <Value Type='Lookup'>{locationId}</Value>
+                                </Eq>
+                            </And>
+                          </Where>
+                        </Query>
+                        {GetOrderByAndRowLimit()}
+                        </View>";
+        }
+        private string GetQueryUpcoming()
+        {
+            string dateFormatted = DateTime.Now.ToString("s");
 
+            return $@"<View>
+                        {GetViewFields()}
+                        <Query>
+                          <Where>
+                            <Geq>
+                              <FieldRef Name='{dateColumn}'/>
+                              <Value Type='DateTime' IncludeTimeValue='FALSE'>{dateFormatted}</Value>
+                            </Geq>
+                          </Where>
+                        </Query>
+                        {GetOrderByAndRowLimit()}
+                        </View>";
+        }
         private string GetQueryUpcomingByUserId(int userId)
         {
             string dateFormatted = DateTime.Now.ToString("s");
 
             return $@"<View>
-                        <ViewFields>
-                          <FieldRef Name='Title' />
-                          <FieldRef Name='{userColumn}' />
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{dateColumn}' />
-                          <FieldRef Name='{checkinColumn}' />
-                          <FieldRef Name='{slotColumn}' />
-                          <FieldRef Name='{checkoutColumn}' />                          
-                          <FieldRef Name='{deskCodeColumn}' /> 
-                          <FieldRef Name='{locationColumn}' />
-                        </ViewFields>
+                        {GetViewFields()}
                         <Query>
                           <Where>
                             <And>
@@ -633,8 +492,30 @@ namespace SafeDesk365.Api.Bookings
                             </And>
                           </Where>
                         </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>100</RowLimit>
+                        {GetOrderByAndRowLimit()}
+                        </View>";
+        }
+        private string GetQueryUpcomingByLocationId(int locationId)
+        {
+            string dateFormatted = DateTime.Now.ToString("s");
+
+            return $@"<View>
+                        {GetViewFields()}
+                        <Query>
+                          <Where>
+                            <And>
+                            <Geq>
+                              <FieldRef Name='{dateColumn}'/>
+                              <Value Type='DateTime' IncludeTimeValue='FALSE'>{dateFormatted}</Value>
+                            </Geq>
+                            <Eq>
+                              <FieldRef Name='{locationColumn}' LookupId='TRUE'/>
+                              <Value Type='Lookup'>{locationId}</Value>
+                            </Eq>
+                            </And>
+                          </Where>
+                        </Query>
+                        {GetOrderByAndRowLimit()}
                         </View>";
         }
         private string GetQueryUpcomingByLocationIdAndUserId(int locationId, int userId)
@@ -642,17 +523,7 @@ namespace SafeDesk365.Api.Bookings
             string dateFormatted = DateTime.Now.ToString("s");
 
             return $@"<View>
-                        <ViewFields>
-                          <FieldRef Name='Title' />
-                          <FieldRef Name='{userColumn}' />
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{dateColumn}' />
-                          <FieldRef Name='{checkinColumn}' />
-                          <FieldRef Name='{slotColumn}' />
-                          <FieldRef Name='{checkoutColumn}' />                          
-                          <FieldRef Name='{deskCodeColumn}' />
-                          <FieldRef Name='{locationColumn}' />
-                        </ViewFields>
+                        {GetViewFields()}
                         <Query>
                           <Where>
                             <And>
@@ -662,7 +533,7 @@ namespace SafeDesk365.Api.Bookings
                             </Geq>
                                 <And>
                                 <Eq>
-                                  <FieldRef Name='{locationColumn}'/>
+                                  <FieldRef Name='{locationColumn}' LookupId='TRUE'/>
                                   <Value Type='Lookup'>{locationId}</Value>
                                 </Eq>
                                 <Eq>
@@ -673,11 +544,9 @@ namespace SafeDesk365.Api.Bookings
                             </And>
                           </Where>
                         </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>100</RowLimit>
+                        {GetOrderByAndRowLimit()}
                         </View>";
         }
-
-        
-    }
+        #endregion
+    }    
 }

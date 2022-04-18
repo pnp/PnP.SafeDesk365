@@ -23,46 +23,18 @@ namespace SafeDesk365.Api.Bookings
 
         internal static Task<List<Booking>> GetAllBookings(IBookingService service, string? userEmail, string? location)
         {
-            bool userFilter = userEmail != null && userEmail != "";
-            bool locationFilter = location != null && location != "";
+            userEmail = userEmail == null ? "" : userEmail;
+            location = location == null ? "" : location;
 
-
-            if (userFilter && !locationFilter)
-            {
-                return service.GetAllByUser(userEmail);
-            }
-
-            if (locationFilter && !userFilter)
-            {
-                return service.GetAllByLocation(location);
-            }
-
-            return service.GetAll();
+            return service.GetBookings(BookingQueryType.All, userEmail, location);
         }
 
         internal static Task<List<Booking>> GetUpcomingBookings(IBookingService service, string? userEmail, string? location)
         {
-            bool userFilter = userEmail != null && userEmail != "";
-            bool locationFilter = location != null && location != "";
-
-            if(userFilter && !locationFilter)
-            {
-               return service.GetUpcomingByUser(userEmail);
-            }
-
-            if(locationFilter && !userFilter)
-            {
-               
-            }
-
-            if(userFilter && locationFilter)
-            {
-                
-            }
-            
+            userEmail = userEmail == null ? "" : userEmail;
+            location = location == null ? "" : location;
  
-                return service.GetUpcoming();
-            
+            return service.GetBookings(BookingQueryType.Upcoming, userEmail, location);            
         }
 
         internal static Task<Booking> GetBookingById(IBookingService service, int id)
