@@ -5,8 +5,7 @@ namespace SafeDesk365.Api.DeskAvailabilities
     {
         public static void MapDeskAvailabilityEndpoints(this WebApplication app)
         {
-            app.MapGet("/api/deskAvailabilities", GetAllDeskAvailabilities);
-            app.MapGet("/api/deskAvailabilities/location/{location}", GetDeskAvailabilityByLocation);
+            app.MapGet("/api/deskAvailabilities/upcoming/", GetUpcomingDeskAvailabilities);            
             app.MapGet("/api/deskAvailabilities/date/{date}", GetDeskAvailabilityByDate);         
             app.MapPost("/api/deskAvailabilities/upcoming", CreateUpcomingDeskAvailabilities);
         }
@@ -16,16 +15,16 @@ namespace SafeDesk365.Api.DeskAvailabilities
             services.AddSingleton<IDeskAvailabilityService, SPListDeskAvailabilityService>();
         }
 
-        internal static Task<List<DeskAvailability>> GetAllDeskAvailabilities(IDeskAvailabilityService service)
+        internal static Task<List<DeskAvailability>> GetUpcomingDeskAvailabilities(IDeskAvailabilityService service, string? location)
         {
-            return service.GetAll();
+            if(location != null && location != "")
+            {
+                return service.GetUpcomingByLocation(location);
+            }
+            
+            return service.GetUpcoming();
         }
-
-        internal static Task<List<DeskAvailability>> GetDeskAvailabilityByLocation(IDeskAvailabilityService service, string location)
-        {
-            return service.GetByLocation(location);
-        }
-
+        
         internal static Task<List<DeskAvailability>> GetDeskAvailabilityByDate(IDeskAvailabilityService service, DateTime date)
         {
             return service.GetByDate(date);

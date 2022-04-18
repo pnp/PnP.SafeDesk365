@@ -10,6 +10,7 @@ namespace SafeDesk365.Api.Bookings
         private readonly IFacilityService facilitiesService;
         private readonly ILocationService locationService;
         private readonly IDeskService deskService;
+        private readonly IDeskAvailabilityService deskAvailabilityService;
 
         string listTitle;
         string userColumn;
@@ -20,17 +21,21 @@ namespace SafeDesk365.Api.Bookings
         string checkoutColumn;
         string locationColumn;
 
-        public SPListBookingService(IPnPContextFactory pnPContextFactory, IConfiguration configuration,
-            IFacilityService facilitiesService, ILocationService locationService, IDeskService deskService)
+        public SPListBookingService(IPnPContextFactory pnpContextFactory, IConfiguration configuration,
+            IFacilityService facilitiesService, ILocationService locationService, IDeskService deskService,
+            IDeskAvailabilityService deskAvailabilityService)
         {
-            this.pnpContextFactory = pnPContextFactory;
+            this.pnpContextFactory = pnpContextFactory;
             this.configuration = configuration;
             this.facilitiesService = facilitiesService;
             this.locationService = locationService;
             this.deskService = deskService;
+            this.deskAvailabilityService = deskAvailabilityService;
+
+
 
             #region SPListColumn Mappings
-            
+
             listTitle = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:ListName");
             userColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingUserColumn");
             deskCodeColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:DeskCodeColumn");
@@ -39,6 +44,7 @@ namespace SafeDesk365.Api.Bookings
             checkinColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingCheckinColumn");
             checkoutColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingCheckoutColumn");
             locationColumn = configuration.GetValue<string>("SafeDesk365:Lists:Bookings:BookingLocationColumn");
+
             #endregion
 
         }
@@ -77,6 +83,46 @@ namespace SafeDesk365.Api.Bookings
                 values.Add(locationColumn, locationId);
 
                 var addedItem = await myList.Items.AddAsync(values);
+
+                return addedItem.Id;
+            }
+        }
+
+        public async Task<int> CreateFromAvailability(int availabilityId, string userEmail)
+        {
+            List<Desk> desks = await deskService.GetAll();
+            var locations = await locationService.GetAll();
+            var facilities = await facilitiesService.GetAll();
+            var deskAvailability = await deskAvailabilityService.GetById(availabilityId);
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                Dictionary<string, object> values = new();                
+
+                IField userField = myList.Fields.AsRequested().FirstOrDefault(f => f.InternalName == userColumn);
+                var myUser = await context.Web.EnsureUserAsync(userEmail);
+                var locationId = locations.First(l => l.Name.Equals(deskAvailability.Location)).Id;
+
+                values.Add("Title", deskAvailability.Title);
+                values.Add(deskCodeColumn, deskAvailability.Code);
+                values.Add(dateColumn, deskAvailability.Date);
+                values.Add(slotColumn, deskAvailability.TimeSlot);
+                values.Add(userColumn, userField.NewFieldUserValue(myUser));
+                values.Add(locationColumn, locationId);
+
+                var addedItem = await myList.Items.AddAsync(values);
+
+                await deskAvailabilityService.Delete(availabilityId);
 
                 return addedItem.Id;
             }
@@ -153,7 +199,7 @@ namespace SafeDesk365.Api.Bookings
                             p => p.TypeAsString,
                             p => p.Title));
 
-                string viewXml = GetAllUpcomingQuery();
+                string viewXml = GetQueryAllUpcoming();
 
                 var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
                 {
@@ -175,9 +221,129 @@ namespace SafeDesk365.Api.Bookings
             return result;
         }
                    
-        public Task<List<Booking>> GetAllForUser(string email)
+        public async Task<List<Booking>> GetAllByUser(string email)
         {
-            throw new NotImplementedException();
+            var result = new List<Booking>();
+
+            var facilities = await facilitiesService.GetAll();
+            var locations = await locationService.GetAll();
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                var myUser = await context.Web.EnsureUserAsync(email);                
+                string viewXml = GetQueryAllByUserId(myUser.Id);
+
+                var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
+                {
+                    ViewXml = viewXml,
+                    DatesInUtc = true,
+                    RenderOptions = RenderListDataOptionsFlags.ListData
+                });
+
+                foreach (var item in myList.Items.AsRequested())
+                {
+                    var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
+                    ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
+
+                    Booking booking = GetBooking(facilities, locations, item, user);
+                    result.Add(booking);
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<List<Booking>> GetAllByLocation(string location)
+        {
+            var result = new List<Booking>();
+
+            var facilities = await facilitiesService.GetAll();
+            var locations = await locationService.GetAll();
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                int locationId = locations.First(l => l.Name.ToLower().Equals(location.ToLower())).Id;
+                string viewXml = GetQueryAllByLocationId(locationId);
+
+                var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
+                {
+                    ViewXml = viewXml,
+                    RenderOptions = RenderListDataOptionsFlags.ListData
+                });
+
+                foreach (var item in myList.Items.AsRequested())
+                {
+                    var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
+                    ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
+
+                    Booking booking = GetBooking(facilities, locations, item, user);
+                    result.Add(booking);
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<List<Booking>> GetUpcomingByUser(string email)
+        {
+            var result = new List<Booking>();
+
+            var facilities = await facilitiesService.GetAll();
+            var locations = await locationService.GetAll();
+
+            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
+            {
+                var myList = context
+                        .Web
+                        .Lists
+                        .GetByTitle(listTitle,
+                            p => p.Title,
+                            p => p.Fields.QueryProperties(p => p.InternalName,
+                            p => p.FieldTypeKind,
+                            p => p.TypeAsString,
+                            p => p.Title));
+
+                var myUser = await context.Web.EnsureUserAsync(email);
+                string viewXml = GetQueryUpcomingByUserId(myUser.Id);
+
+                var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
+                {
+                    ViewXml = viewXml,
+                    DatesInUtc = true,
+                    RenderOptions = RenderListDataOptionsFlags.ListData
+                });
+
+                foreach (var item in myList.Items.AsRequested())
+                {
+                    var usrId = (item.Values[userColumn] as IFieldUserValue).LookupId;
+                    ISharePointUser user = await context.Web.GetUserByIdAsync(usrId);
+
+                    Booking booking = GetBooking(facilities, locations, item, user);
+                    result.Add(booking);
+                }
+            }
+
+            return result;
         }
 
         public async Task<Booking> GetById(int id)
@@ -295,7 +461,7 @@ namespace SafeDesk365.Api.Bookings
             return booking;
         }
 
-        private string GetByIdQuery(int id)
+        private string GetQueryById(int id)
         {            
             return $@"<View>
                         <ViewFields>
@@ -321,7 +487,7 @@ namespace SafeDesk365.Api.Bookings
                         <RowLimit>500</RowLimit>
                         </View>";
         }
-        private string GetAllUpcomingQuery()
+        private string GetQueryAllUpcoming()
         {
             string dateFormatted = DateTime.Now.ToString("s");
 
@@ -349,7 +515,7 @@ namespace SafeDesk365.Api.Bookings
                         <RowLimit>500</RowLimit>
                         </View>";
         }
-        private string GetAllUpcomingByLocationIdQuery(int locationId)
+        private string GetQueryAllUpcomingByLocationId(int locationId)
         {
             string dateFormatted = DateTime.Now.ToString("s");
 
@@ -383,10 +549,8 @@ namespace SafeDesk365.Api.Bookings
                         <RowLimit>100</RowLimit>
                         </View>";
         }
-        private string GetAllByLocationIdQuery(int locationId)
-        {
-            string dateFormatted = DateTime.Now.ToString("s");
-
+        private string GetQueryAllByLocationId(int locationId)
+        {            
             return $@"<View>
                         <ViewFields>
                           <FieldRef Name='Title' />
@@ -398,7 +562,6 @@ namespace SafeDesk365.Api.Bookings
                           <FieldRef Name='{checkoutColumn}' />                          
                           <FieldRef Name='{deskCodeColumn}' />
                           <FieldRef Name='{locationColumn}' />  
-
                         </ViewFields>
                         <Query>
                           <Where>                            
@@ -412,7 +575,35 @@ namespace SafeDesk365.Api.Bookings
                         <RowLimit>100</RowLimit>
                         </View>";
         }
-        private string GetUpcomingByUserIdQuery(int locationId, int userId)
+
+        private string GetQueryAllByUserId(int userId)
+        {            
+            return $@"<View>
+                        <ViewFields>
+                          <FieldRef Name='Title' />
+                          <FieldRef Name='{userColumn}' />
+                          <FieldRef Name='{deskCodeColumn}' />
+                          <FieldRef Name='{dateColumn}' />
+                          <FieldRef Name='{checkinColumn}' />
+                          <FieldRef Name='{slotColumn}' />
+                          <FieldRef Name='{checkoutColumn}' />                          
+                          <FieldRef Name='{deskCodeColumn}' /> 
+                          <FieldRef Name='{locationColumn}' />
+                        </ViewFields>
+                        <Query>
+                          <Where>                                                            
+                            <Eq>
+                              <FieldRef Name='{userColumn}' LookupId='TRUE'/>
+                              <Value Type='Lookup'>{userId}</Value>
+                            </Eq>                                                            
+                          </Where>
+                        </Query>
+                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
+                        <RowLimit>100</RowLimit>
+                        </View>";
+        }
+
+        private string GetQueryUpcomingByUserId(int userId)
         {
             string dateFormatted = DateTime.Now.ToString("s");
 
@@ -446,7 +637,7 @@ namespace SafeDesk365.Api.Bookings
                         <RowLimit>100</RowLimit>
                         </View>";
         }
-        private string GetUpcomingByLocationIdAndUserIdQuery(int locationId, int userId)
+        private string GetQueryUpcomingByLocationIdAndUserId(int locationId, int userId)
         {
             string dateFormatted = DateTime.Now.ToString("s");
 
@@ -487,5 +678,6 @@ namespace SafeDesk365.Api.Bookings
                         </View>";
         }
 
+        
     }
 }

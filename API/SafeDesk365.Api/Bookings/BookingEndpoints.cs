@@ -7,9 +7,10 @@ namespace SafeDesk365.Api.Bookings
         {
             app.MapGet("/api/bookings", GetAllBookings);
             app.MapGet("/api/bookings/{id}", GetBookingById);
-            app.MapGet("/api/bookings/upcoming", GetAllUpcomingBookings);
+            app.MapGet("/api/bookings/upcoming", GetUpcomingBookings);            
             app.MapPost("/api/bookings", CreateBooking);
-           // app.MapPut("/api/bookings/{id}", UpdateBooking);
+            app.MapPost("/api/bookings/availability/{id}", CreateBookingFromAvailability);
+            // app.MapPut("/api/bookings/{id}", UpdateBooking);
             app.MapPut("/api/bookings/checkin/{id}", CheckInBooking);
             app.MapPut("/api/bookings/checkout/{id}", CheckOutBooking);
             app.MapDelete("/api/bookings/{id}", DeleteBookingById);
@@ -22,20 +23,46 @@ namespace SafeDesk365.Api.Bookings
 
         internal static Task<List<Booking>> GetAllBookings(IBookingService service, string? userEmail, string? location)
         {
-            //no user filter & no location filter,
+            bool userFilter = userEmail != null && userEmail != "";
+            bool locationFilter = location != null && location != "";
 
-            // user filter
 
-            // location filter
+            if (userFilter && !locationFilter)
+            {
+                return service.GetAllByUser(userEmail);
+            }
 
-            // both filters
-            
+            if (locationFilter && !userFilter)
+            {
+                return service.GetAllByLocation(location);
+            }
+
             return service.GetAll();
         }
 
-        internal static Task<List<Booking>> GetAllUpcomingBookings(IBookingService service, string? userEmail, string? location)
+        internal static Task<List<Booking>> GetUpcomingBookings(IBookingService service, string? userEmail, string? location)
         {
-            return service.GetUpcoming();
+            bool userFilter = userEmail != null && userEmail != "";
+            bool locationFilter = location != null && location != "";
+
+            if(userFilter && !locationFilter)
+            {
+               return service.GetUpcomingByUser(userEmail);
+            }
+
+            if(locationFilter && !userFilter)
+            {
+               
+            }
+
+            if(userFilter && locationFilter)
+            {
+                
+            }
+            
+ 
+                return service.GetUpcoming();
+            
         }
 
         internal static Task<Booking> GetBookingById(IBookingService service, int id)
@@ -47,6 +74,11 @@ namespace SafeDesk365.Api.Bookings
         internal static Task<int> CreateBooking(IBookingService service, Booking booking)
         {
             return service.Create(booking);            
+        }
+
+        internal static Task<int> CreateBookingFromAvailability(IBookingService service, int id, string userEmail)
+        {
+            return service.CreateFromAvailability(id, userEmail);
         }
 
         internal static IResult UpdateBooking(IBookingService service, int id, Booking updatedBooking)
