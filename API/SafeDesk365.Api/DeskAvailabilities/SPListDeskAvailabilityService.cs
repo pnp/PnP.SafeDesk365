@@ -18,6 +18,7 @@ namespace SafeDesk365.Api.DeskAvailabilities
         string bookingSlotColumn;
         string deskLocationColumn;
         string facilitiesColumn;
+        int rowlimit = 0;
 
         public SPListDeskAvailabilityService(IPnPContextFactory pnPContextFactory, IConfiguration configuration,
             IFacilityService facilitiesService, ILocationService locationService, IDeskService deskService)
@@ -39,13 +40,14 @@ namespace SafeDesk365.Api.DeskAvailabilities
             bookingSlotColumn = configuration.GetValue<string>("SafeDesk365:Lists:DeskAvailabilities:BookingSlotColumn");
             deskLocationColumn = configuration.GetValue<string>("SafeDesk365:Lists:DeskAvailabilities:DeskLocationColumn");
             facilitiesColumn = configuration.GetValue<string>("SafeDesk365:Lists:DeskAvailabilities:FacilitiesColumn");
+            rowlimit = configuration.GetValue<int>("SafeDesk365:Lists:DeskAvailabilities:RowLimit");
 
 
             #endregion
 
         }
 
-        public async Task<List<DeskAvailability>> GetUpcoming()
+        public async Task<List<DeskAvailability>> GetUpcoming(DateTime? selectedDate = null, string location = "")
         {
             var result = new List<DeskAvailability>();
 
@@ -64,7 +66,7 @@ namespace SafeDesk365.Api.DeskAvailabilities
                             p => p.TypeAsString,
                             p => p.Title));
 
-                string viewXml = GetQueryAvailable();
+                string viewXml = GetQueryString(selectedDate, location, locations);                
 
                 var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
                 {
@@ -81,6 +83,32 @@ namespace SafeDesk365.Api.DeskAvailabilities
             }
 
             return result;
+        }
+
+        private string GetQueryString(DateTime? selectedDate, string location, List<Location> locations)
+        {
+            string viewXml = "";
+            if (selectedDate == null && location == "")
+                viewXml = GetQueryAvailable();
+
+            if (selectedDate != null && location == "")
+            {
+                viewXml = GetQueryByDate(Convert.ToDateTime(selectedDate));
+            }
+
+            if (location != "" && selectedDate == null)
+            {               
+                var locationId = locations.First(l => l.Name.ToLower().Equals(location.ToLower())).Id;
+                viewXml = GetQueryByLocationId(locationId);
+            }
+
+            if (selectedDate != null && location != "")
+            {
+                var locationId = locations.First(l => l.Name.ToLower().Equals(location.ToLower())).Id;
+                viewXml = GetQueryByDateAndLocation(Convert.ToDateTime(selectedDate), locationId);
+            }
+
+            return viewXml;
         }
 
         public async Task<DeskAvailability> GetById(int id)
@@ -107,91 +135,7 @@ namespace SafeDesk365.Api.DeskAvailabilities
             }
 
             return result;
-        }
-
-        public async Task<List<DeskAvailability>> GetUpcomingByLocation(string location)
-        {
-            var result = new List<DeskAvailability>();
-
-            var facilities = await facilitiesService.GetAll();
-            var locations = await locationService.GetAll();
-
-            if (locations.Count(l => l.Name.ToLower().Equals(location.ToLower())) <= 0)
-                return result;
-
-            var locationId = locations.First(l => l.Name.ToLower().Equals(location.ToLower())).Id;
-
-            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
-            {
-                var myList = context
-                        .Web
-                        .Lists
-                        .GetByTitle(listTitle,
-                            p => p.Title,
-                            p => p.Fields.QueryProperties(p => p.InternalName,
-                            p => p.FieldTypeKind,
-                            p => p.TypeAsString,
-                            p => p.Title));
-
-                string viewXml = GetQueryByLocationId(locationId);
-
-                var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
-                {
-                    ViewXml = viewXml,
-                    RenderOptions = RenderListDataOptionsFlags.ListData
-                });
-
-                foreach (var item in myList.Items.AsRequested())
-                {
-                    DeskAvailability deskAvailability = GetDeskAvailability(facilities, locations, item);
-                    result.Add(deskAvailability);
-                }
-            }
-
-            return result;
-        }
-
-        public async Task<List<DeskAvailability>> GetByDate(DateTime selectedDate)
-        {
-            var result = new List<DeskAvailability>();
-
-            var facilities = await facilitiesService.GetAll();
-            var locations = await locationService.GetAll();
-
-            if (DateTime.UtcNow.Date > selectedDate.ToUniversalTime().Date)
-                return result;
-
-            using (var context = await pnpContextFactory.CreateAsync("SafeDesk365"))
-            {
-                var myList = context
-                        .Web
-                        .Lists
-                        .GetByTitle(listTitle,
-                            p => p.Title, 
-                            p => p.Fields.QueryProperties(p => p.InternalName,
-                            p => p.FieldTypeKind,
-                            p => p.TypeAsString,
-                            p => p.Title));
-
-                string viewXml = GetQueryByDate(selectedDate);
-               
-                var output = await myList.LoadListDataAsStreamAsync(new RenderListDataOptions()
-                {
-                    ViewXml = viewXml,
-                    DatesInUtc = true,
-                    RenderOptions = RenderListDataOptionsFlags.ListData
-                });
-
-                foreach (var item in myList.Items.AsRequested())
-                {
-                    DeskAvailability deskAvailability = GetDeskAvailability(facilities, locations, item);
-                    result.Add(deskAvailability);
-                }
-            }
-
-            return result;
-
-        }
+        }       
 
         public async Task<int> CreateUpcomingDeskAvailabilities(DateTime from, DateTime to)
         {
@@ -283,12 +227,9 @@ namespace SafeDesk365.Api.DeskAvailabilities
             return facilitiesValues;
         }
 
-        private string GetQueryByLocationId(int locationId)
+        private string GetViewFields()
         {
-            string dateFormatted = DateTime.Today.ToString("s");
-
-            return $@"<View>
-                        <ViewFields>
+            return $@"<ViewFields>
                           <FieldRef Name='Title' />
                           <FieldRef Name='{deskDescriptionColumn}' />
                           <FieldRef Name='{facilitiesColumn}' />
@@ -297,8 +238,21 @@ namespace SafeDesk365.Api.DeskAvailabilities
                           <FieldRef Name='{coffeeMachineDistanceColumn}' />
                           <FieldRef Name='{bookingSlotColumn}' />
                           <FieldRef Name='{bookingDateColumn}' />
-                          <FieldRef Name='{deskCodeColumn}' />                          
-                        </ViewFields>
+                          <FieldRef Name='{deskCodeColumn}' />   
+                        </ViewFields>";
+        }
+
+        private string GetOrderByAndRowLimit()
+        {
+            return $@"<OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
+                      <RowLimit>{rowlimit}</RowLimit>";
+        }
+        private string GetQueryByLocationId(int locationId)
+        {
+            string dateFormatted = DateTime.Today.ToString("s");
+
+            return $@"<View>
+                        {GetViewFields()}
                         <Query>
                           <Where>
                             <And>
@@ -313,8 +267,32 @@ namespace SafeDesk365.Api.DeskAvailabilities
                             </And> 
                           </Where>
                         </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>100</RowLimit>
+                        {GetOrderByAndRowLimit()}
+                        </View>";
+        }
+
+        private string GetQueryByDateAndLocation(DateTime date, int locationId)
+        {
+
+            string dateFormatted = date.ToString("s");
+            
+            return $@"<View>
+                        {GetViewFields()}
+                        <Query>
+                          <Where>
+                            <And>
+                            <Eq>
+                              <FieldRef Name='{deskLocationColumn}' LookupId='TRUE'/>
+                              <Value Type='Lookup'>{locationId}</Value>
+                            </Eq>
+                            <Eq>
+                              <FieldRef Name='{bookingDateColumn}'/>
+                              <Value Type='DateTime' IncludeTimeValue='FALSE'>{dateFormatted}</Value>
+                            </Eq>
+                            </And>
+                          </Where>
+                        </Query>
+                        {GetOrderByAndRowLimit()}
                         </View>";
         }
 
@@ -322,19 +300,9 @@ namespace SafeDesk365.Api.DeskAvailabilities
         {
 
             string dateFormatted = date.ToString("s");
-            
+
             return $@"<View>
-                        <ViewFields>
-                          <FieldRef Name='Title' />
-                          <FieldRef Name='{deskDescriptionColumn}' />
-                          <FieldRef Name='{facilitiesColumn}' />
-                          <FieldRef Name='{deskLocationColumn}' />
-                          <FieldRef Name='{deskPictureColumn}' />
-                          <FieldRef Name='{coffeeMachineDistanceColumn}' />
-                          <FieldRef Name='{bookingSlotColumn}' />
-                          <FieldRef Name='{bookingDateColumn}' />
-                          <FieldRef Name='{deskCodeColumn}' />                          
-                        </ViewFields>
+                        {GetViewFields()}
                         <Query>
                           <Where>
                             <Eq>
@@ -343,8 +311,7 @@ namespace SafeDesk365.Api.DeskAvailabilities
                             </Eq>
                           </Where>
                         </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>100</RowLimit>
+                        {GetOrderByAndRowLimit()}
                         </View>";
         }
 
@@ -353,17 +320,7 @@ namespace SafeDesk365.Api.DeskAvailabilities
             string dateFormatted = DateTime.Today.ToString("s");
 
             return $@"<View>
-                        <ViewFields>
-                          <FieldRef Name='Title' />
-                          <FieldRef Name='{deskDescriptionColumn}' />
-                          <FieldRef Name='{facilitiesColumn}' />
-                          <FieldRef Name='{deskLocationColumn}' />
-                          <FieldRef Name='{deskPictureColumn}' />
-                          <FieldRef Name='{coffeeMachineDistanceColumn}' />
-                          <FieldRef Name='{bookingSlotColumn}' />
-                          <FieldRef Name='{bookingDateColumn}' />
-                          <FieldRef Name='{deskCodeColumn}' />                          
-                        </ViewFields>
+                        {GetViewFields()}
                         <Query>
                           <Where>
                             <Geq>
@@ -372,8 +329,7 @@ namespace SafeDesk365.Api.DeskAvailabilities
                             </Geq>
                           </Where>
                         </Query>
-                        <OrderBy Override='TRUE'><FieldRef Name= 'ID' Ascending= 'FALSE' /></OrderBy>
-                        <RowLimit>100</RowLimit>
+                        {GetOrderByAndRowLimit()}
                         </View>";
         }
         
