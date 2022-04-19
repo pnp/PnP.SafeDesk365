@@ -17,9 +17,9 @@ namespace SafeDesk365.Api.Desks
             _desks.Remove(id);
         }
 
-        public async Task<List<Desk>> GetAll()
+        public Task<List<Desk>> GetAll()
         {
-            return _desks.Values.ToList();
+            return Task.FromResult(_desks.Values.ToList());
         }
 
         public Desk? GetById(int id)
