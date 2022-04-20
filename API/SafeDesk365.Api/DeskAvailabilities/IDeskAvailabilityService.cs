@@ -4,13 +4,10 @@ namespace SafeDesk365.Api.DeskAvailabilities
     public interface IDeskAvailabilityService
     {
 
-        Task<List<DeskAvailability>> GetAll();
-
-        Task<List<DeskAvailability>> GetByLocation(string location);
-
-        Task<List<DeskAvailability>> GetByDate(DateTime selectedDate);
-
+        Task<List<DeskAvailability>> GetUpcoming(DateTime? selectedDate = null, string location = "");
+        Task<DeskAvailability> GetById(int id);
         Task<int> CreateUpcomingDeskAvailabilities(DateTime from, DateTime to);
-        
+        Task<bool> Delete(int id);
+
     }
 }
