@@ -5,15 +5,15 @@ namespace SafeDesk365.Api.Locations
     {
         public static void MapLocationEndpoints(this WebApplication app)
         {
-            app.MapGet("/api/locations", GetAllLocations);           
+            app.MapGet("/api/locations", GetAllLocations).RequireAuthorization();
         }
 
         public static void AddLocationServices(this IServiceCollection services)
         {
-            services.AddSingleton<ILocationService, SPListLocationService>();
+            services.AddSingleton<ILocationService, InMemoryLocationService>();
         }
 
-        internal static Task<List<Location>> GetAllLocations(ILocationService service)
+        internal static Task<List<Location>> GetAllLocations(ILocationService service, ClaimsPrincipal user)
         {
             return service.GetAll();
         }

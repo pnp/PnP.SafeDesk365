@@ -14,7 +14,7 @@ namespace SafeDesk365.Api.Facilities
 
         public static void AddFacilityServices(this IServiceCollection services)
         {
-            services.AddSingleton<IFacilityService, SPListFacilitiesService>();
+            services.AddSingleton<IFacilityService, InMemoryFacilityService>();
         }
 
         internal static Task<List<Facility>> GetAllFacilities(IFacilityService service)
