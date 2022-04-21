@@ -1,0 +1,33 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.3",
+  "body": [
+      {
+          "type": "Container",
+          "items": [
+              {
+                  "type": "TextBlock",
+                  "text": "Search for a free desk:",
+                  "wrap": true
+              },
+              {
+                "type": "Input.ChoiceSet",
+                "placeholder": "Select location",
+                "choices": [
+                    {
+                        "$data": "${$root['locations']}",
+                        "title": "${name} [${address}]",
+                        "value": "${id}"
+                    }
+                ],
+                "id": "freeDeskLocation"
+            },
+            {
+                "type": "Input.Date",
+                "id": "freeDeskDate"
+            }
+        ]
+      }
+    ]
+}
