@@ -6,9 +6,9 @@ import {
   ICardButton
 } from '@microsoft/sp-adaptive-card-extension-base';
 import * as strings from 'SafeDesk365AceAdaptiveCardExtensionStrings';
+import { ISafeDesk365AceAdaptiveCardExtensionProps } from '../ISafeDesk365AceAdaptiveCardExtensionProps';
+import { ISafeDesk365AceAdaptiveCardExtensionState } from '../ISafeDesk365AceAdaptiveCardExtensionState';
 import { 
-  ISafeDesk365AceAdaptiveCardExtensionProps, 
-  ISafeDesk365AceAdaptiveCardExtensionState, 
   QUICK_VIEW_BOOK_CHOOSE_FLOW_ID,
   QUICK_VIEW_CHECKIN_ID,
   QUICK_VIEW_CHECKOUT_ID
