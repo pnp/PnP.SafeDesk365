@@ -10,7 +10,7 @@ namespace SafeDesk365.Api.Locations
 
         public static void AddLocationServices(this IServiceCollection services)
         {
-            services.AddSingleton<ILocationService, InMemoryLocationService>();
+            services.AddSingleton<ILocationService, SPListLocationService>();
         }
 
         internal static Task<List<Location>> GetAllLocations(ILocationService service, ClaimsPrincipal user)

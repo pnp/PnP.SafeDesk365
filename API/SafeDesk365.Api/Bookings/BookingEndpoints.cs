@@ -5,15 +5,15 @@ namespace SafeDesk365.Api.Bookings
     {
         public static void MapBookingEndpoints(this WebApplication app)
         {
-            app.MapGet("/api/bookings", GetAllBookings);
-            app.MapGet("/api/bookings/{id}", GetBookingById);
-            app.MapGet("/api/bookings/upcoming", GetUpcomingBookings);            
-            app.MapPost("/api/bookings", CreateBooking);
-            app.MapPost("/api/bookings/availability/{id}", CreateBookingFromAvailability);
+            app.MapGet("/api/bookings", GetAllBookings).RequireAuthorization();
+            app.MapGet("/api/bookings/{id}", GetBookingById).RequireAuthorization();
+            app.MapGet("/api/bookings/upcoming", GetUpcomingBookings).RequireAuthorization();            
+            app.MapPost("/api/bookings", CreateBooking).RequireAuthorization();
+            app.MapPost("/api/bookings/availability/{id}", CreateBookingFromAvailability).RequireAuthorization();
             // app.MapPut("/api/bookings/{id}", UpdateBooking);
-            app.MapPut("/api/bookings/checkin/{id}", CheckInBooking);
-            app.MapPut("/api/bookings/checkout/{id}", CheckOutBooking);
-            app.MapDelete("/api/bookings/{id}", DeleteBookingById);
+            app.MapPut("/api/bookings/checkin/{id}", CheckInBooking).RequireAuthorization();
+            app.MapPut("/api/bookings/checkout/{id}", CheckOutBooking).RequireAuthorization();
+            app.MapDelete("/api/bookings/{id}", DeleteBookingById).RequireAuthorization();
         }
 
         public static void AddBookingServices(this IServiceCollection services)

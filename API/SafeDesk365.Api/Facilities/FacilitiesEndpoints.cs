@@ -5,7 +5,18 @@ namespace SafeDesk365.Api.Facilities
     {
         public static void MapFacilityEndpoints(this WebApplication app)
         {
-            app.MapGet("/api/facilities", GetAllFacilities);
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            app.MapGet("/api/facilities", GetAllFacilities).RequireAuthorization();
             //app.MapGet("/facilities/{id}", GetFacilityById);
             //app.MapPost("/facilities", CreateFacility);
             //app.MapPut("/facilities/{id}", UpdateFacility);
@@ -14,7 +25,7 @@ namespace SafeDesk365.Api.Facilities
 
         public static void AddFacilityServices(this IServiceCollection services)
         {
-            services.AddSingleton<IFacilityService, InMemoryFacilityService>();
+            services.AddSingleton<IFacilityService, SPListFacilitiesService>();
         }
 
         internal static Task<List<Facility>> GetAllFacilities(IFacilityService service)
