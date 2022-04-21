@@ -11,7 +11,7 @@ import { ISafeDeskClient } from './ISafeDeskClient';
 
 export class SafeDeskClient implements ISafeDeskClient {
 
-    private authProvider = new AnonymousAuthenticationProvider()
+    private authProvider = new AnonymousAuthenticationProvider();
     private adapter = new FetchRequestAdapter(this.authProvider);
     private client = new ApiClient(this.adapter);
     
