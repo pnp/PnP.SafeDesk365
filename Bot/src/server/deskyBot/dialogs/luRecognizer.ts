@@ -31,22 +31,27 @@ export class LURecognizer {
 
     public getBookingSlotEntities(result) {
         let bookingSlot;
-        bookingSlot = result.entities.$instance.BookingSlot[0].text;
+        if (result.entities.$instance.BookingSlot) {
+            bookingSlot = result.entities.$instance.BookingSlot[0].text;
+        }
         return bookingSlot;
     }
 
     public getDeskCodeEntities(result) {
         let deskCode;
-        deskCode = result.entities.$instance.DeskCode[0].text;
+        if (result.entities.$instance.DeskCode) {
+            deskCode = result.entities.$instance.DeskCode[0].text;
+        }
         return deskCode;
     }
 
     public getDeskLocationEntities(result) {
         let deskLocation;
-        deskLocation = result.entities.$instance.DeskLocation[0].text;
+        if (result.entities.$instance.DeskLocation) {
+            deskLocation = result.entities.$instance.DeskLocation[0].text;
+        }
         return deskLocation;
     }
-
 
     public getDateTimeEntities(result) {
         const datetimeEntity = result.entities.datetime;

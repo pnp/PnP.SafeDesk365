@@ -22,6 +22,7 @@ import { MentionUserDialog } from "./mentionUserDialog";
 import { LuisRecognizer } from 'botbuilder-ai';
 import { LURecognizer } from './luRecognizer';
 import { BookingDialog } from './bookingDialog';
+import { GetDesksDialog } from './getDesksDialog';
 import { BookingDetails } from './bookingDetails';
 
 const MAIN_DIALOG_ID = "mainDialog";
@@ -41,6 +42,7 @@ export class MainDialog extends ComponentDialog {
             .addDialog(new HelpDialog())
             .addDialog(new MentionUserDialog())
             .addDialog(new BookingDialog())
+            .addDialog(new GetDesksDialog())
             .addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG_ID, [
                 this.introStep.bind(this),
                 this.actStep.bind(this),
@@ -73,68 +75,43 @@ export class MainDialog extends ComponentDialog {
 
     private async actStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
         if (stepContext.result) {
-            /*
-            ** This is where you would add LUIS to your bot, see this link for more information:
-            ** https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-v4-luis?view=azure-bot-service-4.0&tabs=javascript
-            */
-
-            const bookingDetails = new BookingDetails();
+            // Get the intent + entities from LUIS
             const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
             const intent = LuisRecognizer.topIntent(luisResult)
-            //await stepContext.context.sendActivity(intent);
-            //console.log(luisResult);
-
             const entities = luisResult.entities;
+            // Get the text values for all needed entities
+            const bookingSlot = this.luisRecognizer.getBookingSlotEntities(luisResult);
+            const dateTimeEntities = this.luisRecognizer.getDateTimeEntities(luisResult);
+            const deskCodeEntities = this.luisRecognizer.getDeskCodeEntities(luisResult);
+            const deskLocationEntities = this.luisRecognizer.getDeskLocationEntities(luisResult);
+            // Populate the bookingDetails
+            const bookingDetails = new BookingDetails();
+            bookingDetails.bookingSlot = bookingSlot;
+            bookingDetails.dateTime = dateTimeEntities;
+            bookingDetails.deskCode = deskCodeEntities;
+            bookingDetails.deskLocation = deskLocationEntities;
+
             console.log(entities.$instance.BookingSlot);
-            //await stepContext.context.sendActivity(entities.$instance.DeskCode);
+            console.log(bookingSlot);
+            console.log(dateTimeEntities);
+            console.log(deskCodeEntities);
+            console.log(deskLocationEntities);
             switch(intent){
                 case "BookDesk":{
                     // Open BookingDialog
                     console.log("Intent is Bookdesk");
-                    const bookingSlot = this.luisRecognizer.getBookingSlotEntities(luisResult);
-                    console.log(bookingSlot);
-                    const dateTimeEntities = this.luisRecognizer.getDateTimeEntities(luisResult);
-                    console.log(dateTimeEntities);
-                    const deskCodeEntities = this.luisRecognizer.getDeskCodeEntities(luisResult);
-                    console.log(deskCodeEntities);
-                    const deskLocationEntities = this.luisRecognizer.getDeskLocationEntities(luisResult);
-                    console.log(deskLocationEntities);
-                    bookingDetails.bookingSlot = bookingSlot;
-                    bookingDetails.dateTime = dateTimeEntities;
-                    bookingDetails.deskCode = deskCodeEntities;
-                    bookingDetails.deskLocation = deskLocationEntities;
                     return await stepContext.beginDialog('bookingDialog', bookingDetails);
                 }
                 case "GetAvailableDesk":{
                     // Open GetAvailableDeskDialog
+                    console.log("Intent is GetAvailableDesk");
+                    return await stepContext.beginDialog('getDesksDialog', bookingDetails);
                 }
                 default: {
                     await stepContext.context.sendActivity("Ok, maybe next time 😉");
                     return await stepContext.next();
                 }  
             }
-
-            /*
-            const result = stepContext.result.trim().toLocaleLowerCase();
-            switch (result) {
-                case "who" :
-                case "who am i?": {
-                    return await stepContext.beginDialog("teamsInfoDialog");
-                }
-                case "get help":
-                case "help": {
-                    return await stepContext.beginDialog("helpDialog");
-                }
-                case "mention me":
-                case "mention": {
-                    return await stepContext.beginDialog("mentionUserDialog");
-                }
-                default: {
-                    await stepContext.context.sendActivity("Ok, maybe next time 😉");
-                    return await stepContext.next();
-                }
-            }
-            */
         } else if (this.onboarding) {
             switch (stepContext.context.activity.text) {
                 case "who": {
