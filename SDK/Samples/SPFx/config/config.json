@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "safedesktest-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/safedesktest/SafedesktestWebPart.js",
+          "manifest": "./src/webparts/safedesktest/SafedesktestWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "SafedesktestWebPartStrings": "lib/webparts/safedesktest/loc/{locale}.js"
+  }
+}
