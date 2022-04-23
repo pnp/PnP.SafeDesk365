@@ -1,0 +1,16 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.14.0",
+    "libraryName": "safedesktest",
+    "libraryId": "27c24335-c3a0-4bfa-b6e7-cd8da8c049c0",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "safedesktest",
+    "solutionShortDescription": "safedesktest description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "safedesktest-typescript-gen",
+    "id": "27c24335-c3a0-4bfa-b6e7-cd8da8c049c0",
+    "version": "1.0.0.1",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.14.0"
+    },
+    "webApiPermissionRequests": [
+      {
+        "resource": "SafeDesk.API.Access",
+        "scope": "booking.write"
+      }
+    ],
+    "metadata": {
+      "shortDescription": {
+        "default": "safedesktest description"
+      },
+      "longDescription": {
+        "default": "safedesktest description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "safedesktest Feature",
+        "description": "The feature that activates elements of the safedesktest solution.",
+        "id": "12805f9a-219a-460a-b8b2-cb4482841b49",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/safedesktest.sppkg"
+  }
+}

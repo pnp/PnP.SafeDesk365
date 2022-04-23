@@ -5,8 +5,8 @@ namespace SafeDesk365.Api.Desks
     {
         public static void MapDeskEndpoints(this WebApplication app)
         {
-            app.MapGet("/api/desks", GetAllDesks);
-            app.MapGet("/api/desks/location/{location}", GetDesksByLocation);     
+            app.MapGet("/api/desks", GetAllDesks).RequireAuthorization();
+            app.MapGet("/api/desks/location/{location}", GetDesksByLocation).RequireAuthorization();     
         }
 
         public static void AddDeskServices(this IServiceCollection services)
