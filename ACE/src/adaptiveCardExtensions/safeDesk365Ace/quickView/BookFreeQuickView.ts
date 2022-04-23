@@ -2,7 +2,7 @@ import { ISPFxAdaptiveCard, BaseAdaptiveCardView } from '@microsoft/sp-adaptive-
 import * as strings from 'SafeDesk365AceAdaptiveCardExtensionStrings';
 import { ISafeDesk365AceAdaptiveCardExtensionProps } from '../ISafeDesk365AceAdaptiveCardExtensionProps';
 import { ISafeDesk365AceAdaptiveCardExtensionState } from '../ISafeDesk365AceAdaptiveCardExtensionState';
-import { Location, Desk } from 'safedesk-sdk/models';
+import { Location, Desk } from 'safedesk365-sdk';
 
 export interface IBookFreeQuickViewData {
   locations: Location[];

@@ -1,4 +1,4 @@
-import { Location } from 'safedesk-sdk/models';
+import { Location } from 'safedesk365-sdk';
 
 export interface ISafeDesk365AceAdaptiveCardExtensionState {
     locations?: Location[];

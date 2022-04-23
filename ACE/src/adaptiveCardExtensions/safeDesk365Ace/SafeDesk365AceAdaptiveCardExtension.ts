@@ -11,7 +11,8 @@ import { SafeDesk365AcePropertyPane } from './SafeDesk365AcePropertyPane';
 import { ISafeDesk365AceAdaptiveCardExtensionProps } from './ISafeDesk365AceAdaptiveCardExtensionProps';
 import { ISafeDesk365AceAdaptiveCardExtensionState } from './ISafeDesk365AceAdaptiveCardExtensionState';
 
-import { safeDesk } from '../../services/safedeskClient/SafeDeskClient';
+import { SafeDesk365Client } from '../../services/safeDesk365Client/SafeDesk365Client';
+import { AadHttpClient, HttpClientResponse } from '@microsoft/sp-http';
 
 const CARD_VIEW_REGISTRY_ID: string = 'SafeDesk365Ace_CARD_VIEW';
 export const QUICK_VIEW_CHECKIN_ID: string = 'SafeDesk365Ace_QV_CHECKIN';
@@ -25,8 +26,9 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
   ISafeDesk365AceAdaptiveCardExtensionState
 > {
   private _deferredPropertyPane: SafeDesk365AcePropertyPane | undefined;
+  private _safeDesk365: SafeDesk365Client;
 
-  public onInit(): Promise<void> {
+  public async onInit(): Promise<void> {
     this.state = {
       locations: undefined
     };
@@ -64,7 +66,25 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
   }
 
   private fetchData = async () => {
-    const locations = await safeDesk.GetLocations();
+
+    // Initialize the SafeDesk365 Client if it is not yet initialized
+    if (!this._safeDesk365) {
+
+      // Initialize the AAD OAuth Token Provider, first
+      const client: AadHttpClient = await this.context.aadHttpClientFactory.getClient(this.properties.safeDesk365ApiUniqueUri);
+      const response: HttpClientResponse = await client.get(`${this.properties.safeDesk365ApiUri}api/locations`, AadHttpClient.configurations.v1);
+      console.log(response.json());
+      
+      const tokenProvider = await this.context.aadTokenProviderFactory.getTokenProvider();
+      const accessToken: string = await tokenProvider.getToken(this.properties.safeDesk365ApiUniqueUri);
+
+      console.log(accessToken);
+
+      // Then create a new instance of the SafeDesk365 Client
+      this._safeDesk365 = new SafeDesk365Client(this.properties.safeDesk365ApiUri, accessToken);
+    }
+
+    const locations = await this._safeDesk365.getLocations();
 
     this.setState({
       locations: locations

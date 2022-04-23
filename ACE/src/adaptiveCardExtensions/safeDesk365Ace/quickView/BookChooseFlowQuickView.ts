@@ -24,9 +24,6 @@ export class BookChooseFlowQuickView extends BaseAdaptiveCardView<
   }
 
   public onAction(action: IActionArguments | any): void {
-
-    console.log(action);
-
     if (action.id == "SpecificDesk") {
       this.quickViewNavigator.push(QUICK_VIEW_BOOK_SPECIFIC_ID);
     } else if (action.id == "FreeDesk") {

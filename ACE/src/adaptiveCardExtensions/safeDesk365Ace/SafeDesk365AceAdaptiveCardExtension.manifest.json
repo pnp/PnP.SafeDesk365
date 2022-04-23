@@ -23,8 +23,10 @@
     "cardSize": "Large",
     "properties": {
       "title": "Safe Desk 365",
-      "description": "Safe Desk 365 Adaptive Card Extension",
-      "iconProperty": "" // Default to sharepointlogo
+      "description": "Book your desk or check-in/out your booking",
+      "iconProperty": "", 
+      "safeDesk365ApiUri": "http://safedesk365-pro.azurewebsites.net/",
+      "safeDesk365ApiUniqueUri": "SafeDesk.API.Access"
     }
   }]
 }
