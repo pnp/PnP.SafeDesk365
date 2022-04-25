@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>0.0.1-alpha</Version>
+    <Configurations>Debug;Release;NoAuth;WithAuth</Configurations>
   </PropertyGroup>
 
 
