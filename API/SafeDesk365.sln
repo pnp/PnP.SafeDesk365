@@ -9,30 +9,48 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SafeDesk365.SDK", "SafeDesk
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SafeDesk365.Api", "SafeDesk365.Api\SafeDesk365.Api.csproj", "{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafeDesk365.TestConsole", "SafeDesk365.TestConsole\SafeDesk365.TestConsole\SafeDesk365.TestConsole.csproj", "{B66368A8-6FDB-44DC-B437-8E098FF2CA10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SafeDesk365.TestConsole", "SafeDesk365.TestConsole\SafeDesk365.TestConsole\SafeDesk365.TestConsole.csproj", "{B66368A8-6FDB-44DC-B437-8E098FF2CA10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		NoAuth|Any CPU = NoAuth|Any CPU
 		Release|Any CPU = Release|Any CPU
+		WithAuth|Any CPU = WithAuth|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.NoAuth|Any CPU.ActiveCfg = NoAuth|Any CPU
+		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.NoAuth|Any CPU.Build.0 = NoAuth|Any CPU
 		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.WithAuth|Any CPU.ActiveCfg = WithAuth|Any CPU
+		{717E48DF-B74D-4CD4-B58D-3B67B521CC3D}.WithAuth|Any CPU.Build.0 = WithAuth|Any CPU
 		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.NoAuth|Any CPU.ActiveCfg = NoAuth|Any CPU
+		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.NoAuth|Any CPU.Build.0 = NoAuth|Any CPU
 		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.WithAuth|Any CPU.ActiveCfg = WithAuth|Any CPU
+		{FF21F8C6-D11A-4959-B0E4-99408C99376F}.WithAuth|Any CPU.Build.0 = WithAuth|Any CPU
 		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.NoAuth|Any CPU.ActiveCfg = NoAuth|Any CPU
+		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.NoAuth|Any CPU.Build.0 = NoAuth|Any CPU
 		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.WithAuth|Any CPU.ActiveCfg = WithAuth|Any CPU
+		{B0DDDE8B-9090-455A-BE1E-9CD8D523B64F}.WithAuth|Any CPU.Build.0 = WithAuth|Any CPU
 		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.NoAuth|Any CPU.ActiveCfg = NoAuth|Any CPU
+		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.NoAuth|Any CPU.Build.0 = NoAuth|Any CPU
 		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.WithAuth|Any CPU.ActiveCfg = WithAuth|Any CPU
+		{B66368A8-6FDB-44DC-B437-8E098FF2CA10}.WithAuth|Any CPU.Build.0 = WithAuth|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,22 +5,22 @@ namespace SafeDesk365.Api.Facilities
     {
         public static void MapFacilityEndpoints(this WebApplication app)
         {
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+#if NOAUTH
+            app.MapGet("/api/facilities", GetAllFacilities);
+            //app.MapGet("/facilities/{id}", GetFacilityById);
+            //app.MapPost("/facilities", CreateFacility);
+            //app.MapPut("/facilities/{id}", UpdateFacility);
+            //app.MapDelete("/facilities/{id}", DeleteFacilityById);
+#endif
+
+#if WITHAUTH
             app.MapGet("/api/facilities", GetAllFacilities).RequireAuthorization();
             //app.MapGet("/facilities/{id}", GetFacilityById);
             //app.MapPost("/facilities", CreateFacility);
             //app.MapPut("/facilities/{id}", UpdateFacility);
             //app.MapDelete("/facilities/{id}", DeleteFacilityById);
+#endif
+
         }
 
         public static void AddFacilityServices(this IServiceCollection services)
