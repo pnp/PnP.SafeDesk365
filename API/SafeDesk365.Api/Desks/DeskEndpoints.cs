@@ -7,14 +7,14 @@ namespace SafeDesk365.Api.Desks
         {
 #if NOAUTH
             app.MapGet("/api/desks", GetAllDesks);
-            app.MapGet("/api/desks/location/{location}", GetDesksByLocation);     
-  
+            app.MapGet("/api/desks/location/{location}", GetDesksByLocation);
 #endif
 
-#if WITHAUTH
+#if RELEASE
             app.MapGet("/api/desks", GetAllDesks).RequireAuthorization();
             app.MapGet("/api/desks/location/{location}", GetDesksByLocation).RequireAuthorization();
 #endif
+
         }
 
         public static void AddDeskServices(this IServiceCollection services)
