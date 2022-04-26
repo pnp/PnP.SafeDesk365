@@ -1,5 +1,6 @@
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Serialization;
+using SafeDesk365.SDK.Api.Bookings.Availability;
 using SafeDesk365.SDK.Api.Bookings.Checkin;
 using SafeDesk365.SDK.Api.Bookings.Checkout;
 using SafeDesk365.SDK.Api.Bookings.Item;
@@ -14,6 +15,10 @@ using System.Threading.Tasks;
 namespace SafeDesk365.SDK.Api.Bookings {
     /// <summary>Builds and executes requests for operations under \api\bookings</summary>
     public class BookingsRequestBuilder {
+        /// <summary>The availability property</summary>
+        public AvailabilityRequestBuilder Availability { get =>
+            new AvailabilityRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The checkin property</summary>
         public CheckinRequestBuilder Checkin { get =>
             new CheckinRequestBuilder(PathParameters, RequestAdapter);

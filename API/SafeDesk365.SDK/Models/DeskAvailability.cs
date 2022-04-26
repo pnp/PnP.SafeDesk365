@@ -23,6 +23,8 @@ namespace SafeDesk365.SDK.Models {
         public string Picture { get; set; }
         /// <summary>The timeSlot property</summary>
         public string TimeSlot { get; set; }
+        /// <summary>The title property</summary>
+        public string Title { get; set; }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
         /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
@@ -45,6 +47,7 @@ namespace SafeDesk365.SDK.Models {
                 {"location", n => { Location = n.GetStringValue(); } },
                 {"picture", n => { Picture = n.GetStringValue(); } },
                 {"timeSlot", n => { TimeSlot = n.GetStringValue(); } },
+                {"title", n => { Title = n.GetStringValue(); } },
             };
         }
         /// <summary>
@@ -62,6 +65,7 @@ namespace SafeDesk365.SDK.Models {
             writer.WriteStringValue("location", Location);
             writer.WriteStringValue("picture", Picture);
             writer.WriteStringValue("timeSlot", TimeSlot);
+            writer.WriteStringValue("title", Title);
         }
     }
 }
