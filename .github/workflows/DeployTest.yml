@@ -37,7 +37,7 @@ jobs:
         working-directory: API/SafeDesk365.Api
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c NoAuth -o ${{env.DOTNET_ROOT}}/myapp
         working-directory: API/SafeDesk365.Api
 
       - name: Upload artifact for deployment job
