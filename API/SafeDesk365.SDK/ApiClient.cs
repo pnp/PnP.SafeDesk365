@@ -34,7 +34,7 @@ namespace SafeDesk365.SDK {
             ApiClientBuilder.RegisterDefaultDeserializer<JsonParseNodeFactory>();
             ApiClientBuilder.RegisterDefaultDeserializer<TextParseNodeFactory>();
             if (string.IsNullOrEmpty(RequestAdapter.BaseUrl)) {
-                RequestAdapter.BaseUrl = "https://safedesk365-test.azurewebsites.net";
+                RequestAdapter.BaseUrl = "https://safedesk365-pro.azurewebsites.net";
             }
         }
     }
