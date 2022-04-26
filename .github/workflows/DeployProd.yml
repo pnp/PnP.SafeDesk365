@@ -1,4 +1,4 @@
-name: Build and deploy ASP.Net Core app to an Azure Web App
+name: Release Production
 
 env:
   AZURE_WEBAPP_NAME: safedesk365-pro    # set this to the name of your Azure Web App
