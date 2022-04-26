@@ -13,12 +13,12 @@ namespace SafeDesk365.Api.Facilities
             //app.MapDelete("/facilities/{id}", DeleteFacilityById);
 #endif
 
-#if WITHAUTH
+#if RELEASE
             app.MapGet("/api/facilities", GetAllFacilities).RequireAuthorization();
-            //app.MapGet("/facilities/{id}", GetFacilityById);
-            //app.MapPost("/facilities", CreateFacility);
-            //app.MapPut("/facilities/{id}", UpdateFacility);
-            //app.MapDelete("/facilities/{id}", DeleteFacilityById);
+            //app.MapGet("/facilities/{id}", GetFacilityById).RequireAuthorization();
+            //app.MapPost("/facilities", CreateFacility).RequireAuthorization();
+            //app.MapPut("/facilities/{id}", UpdateFacility).RequireAuthorization();
+            //app.MapDelete("/facilities/{id}", DeleteFacilityById).RequireAuthorization();
 #endif
 
         }

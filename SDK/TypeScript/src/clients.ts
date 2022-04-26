@@ -366,13 +366,13 @@ export class SafeDesk365 {
      */
     GetUpcomingdeskAvailabilities(selectedDate: string | undefined, location: string | undefined): Promise<DeskAvailability[]> {
         let url_ = this.baseUrl + "/api/deskAvailabilities/upcoming?";
-        if (selectedDate === null)
-            throw new Error("The parameter 'selectedDate' cannot be null.");
-        else if (selectedDate !== undefined)
+        //if (selectedDate === null)
+        //    throw new Error("The parameter 'selectedDate' cannot be null.");
+        if (selectedDate !== null && selectedDate !== undefined)
             url_ += "selectedDate=" + encodeURIComponent("" + selectedDate) + "&";
-        if (location === null)
-            throw new Error("The parameter 'location' cannot be null.");
-        else if (location !== undefined)
+        //if (location === null)
+          //  throw new Error("The parameter 'location' cannot be null.");
+        if (location !== null && location !== undefined)
             url_ += "location=" + encodeURIComponent("" + location) + "&";
         url_ = url_.replace(/[?&]$/, "");
 

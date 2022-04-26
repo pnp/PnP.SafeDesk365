@@ -6,10 +6,10 @@ namespace SafeDesk365.Api.Locations
         public static void MapLocationEndpoints(this WebApplication app)
         {
 #if NOAUTH
-            app.MapGet("/api/locations", GetAllLocations);
+                        app.MapGet("/api/locations", GetAllLocations);
 #endif
 
-#if WITHAUTH
+#if RELEASE
             app.MapGet("/api/locations", GetAllLocations).RequireAuthorization();
 #endif
 
