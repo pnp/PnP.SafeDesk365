@@ -2,7 +2,8 @@ import {
   SafeDesk365, 
   Location, 
   Desk, 
-  DeskAvailability 
+  DeskAvailability,
+  Booking
 } from "safedesk365-sdk";
 import { TimeSlot } from './TimeSlot';
 
@@ -11,12 +12,14 @@ import { ISafeDesk365Client } from './ISafeDesk365Client';
 export class SafeDesk365Client implements ISafeDesk365Client {
 
     private _client: SafeDesk365;
+    private _user: string;
 
     /**
      * Initializes a new instance of the SafeDesk365 client
      */
-    constructor(serviceUri: string, token: string) {
+    constructor(serviceUri: string, token: string, user: string) {
       this._client = new SafeDesk365(serviceUri, token);
+      this._user = user;
     }
     
     /**
@@ -27,33 +30,57 @@ export class SafeDesk365Client implements ISafeDesk365Client {
       return this._client.GetLocations();
     }
  
-     /**
-      * Returns the desks of a specific location
-      * @returns The desks of a specific location
+    /**
+      * Returns the whole list of desks
+      * @returns The whole list of desks
       */
-      public async getDesksByLocation(locationId: string): Promise<Desk[]> {
-        return this._client.GetDeskByLocationName(locationId);
-     }
- 
-     /**
+    public async getDesks(): Promise<Desk[]> {
+        return this._client.GetDesks();
+    }
+
+    /**
+      * Returns the whole list of bookings
+      * @returns The whole list of bookings
+      */
+    public async getBookings(): Promise<Booking[]> {
+      return this._client.GetAllBookings(this._user, undefined);
+    }
+   
+    /**
       * Return the very first free spot in a specific location and date/slot
       * @returns The very first free spot in a specific location and date/slot
       */
-      public async getFreeDesk(locationId: string, date: Date, timeSlot: TimeSlot): Promise<DeskAvailability | undefined> {
-        // const availabilities: DeskAvailability[] = await this.client.api.deskAvailabilities.locationById(locationId).get();
-        // const freeDesk: DeskAvailability = availabilities.find(d => d.date == date && d.timeSlot == timeSlot);
-        // return freeDesk;
-        return null;
-     }
-  
-     /**
-      * Checks if a specific spot in a target location and date/slot is available or not
-      * @returns Whether the requested desk is available in the target location and date/slot
-      */
-      public async checkDeskAvailability(locationId: string, date: Date, timeSlot: TimeSlot, desk: string): Promise<DeskAvailability | undefined> {
-        // const availabilities: DeskAvailability[] = await this.client.api.deskAvailabilities.locationById(locationId).get();
-        // const freeDesk: DeskAvailability = availabilities.find(d => d.date == date && d.timeSlot == timeSlot);
-        // return freeDesk;
-        return null;
-     } 
+    public async getFreeDesk(locationId: string, date: string, timeSlot: TimeSlot): Promise<DeskAvailability | undefined> {
+      let freeDesk: DeskAvailability;  
+      const freeDesks: DeskAvailability[] = await this.getFreeDesks(locationId, date, timeSlot);
+      if (freeDesks.length > 0) {
+        freeDesk = freeDesks[0];
+      }
+      return freeDesk;
+    }
+
+    /**
+     * Return the list of desks in a specific location and date/slot
+     * @returns The list of desks in a specific location and date/slot, if any
+     */
+    public async getFreeDesks(locationId: string, date: string, timeSlot: TimeSlot): Promise<DeskAvailability[] | undefined> {
+      const availabilities: DeskAvailability[] = await this._client.GetUpcomingdeskAvailabilities(date, locationId);
+      const freeDesks: DeskAvailability[] = availabilities.filter(d => d.timeSlot == timeSlot);
+      return freeDesks;
+    }
+
+    /**
+     * Creates a booking for a specific user, location, desk, date, and time slot
+     * @returns The id of the created booking
+     */
+    public async bookDesk(user: string, locationId: string, deskCode: string, date: string, timeSlot: TimeSlot): Promise<number> {
+      return await this._client.CreateSpecificBooking({
+        title: `${user}-${deskCode}-${date}-${timeSlot}`,
+        user: user,
+        deskCode: deskCode,
+        date: date,
+        timeSlot: timeSlot,
+        location: locationId 
+      });
+    }
 }

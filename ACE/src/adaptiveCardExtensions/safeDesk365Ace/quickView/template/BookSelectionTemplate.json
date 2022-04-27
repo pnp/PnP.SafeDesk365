@@ -1,0 +1,126 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.3",
+  "body": [
+      {
+          "type": "Container",
+          "items": [
+              {
+                  "type": "TextBlock",
+                  "text": "Choose location, date, time slot, and your desk selection flow:",
+                  "wrap": true
+              },
+              {
+                  "type": "Container",
+                  "items": [
+                    {
+                        "type": "Input.ChoiceSet",
+                        "placeholder": "Select location",
+                        "choices": [
+                            {
+                                "$data": "${locations}",
+                                "title": "${name} [${address}]",
+                                "value": "${name}"
+                            }
+                        ],
+                        "id": "deskLocation"
+                    },
+                    {
+                        "type": "Input.Date",
+                        "id": "deskDate"
+                    },
+                    {
+                        "type": "Input.ChoiceSet",
+                        "placeholder": "Select time slot",
+                        "choices": [
+                            {
+                                "title": "Morning",
+                                "value": "morning"
+                            },
+                            {
+                                "title": "Afternoon",
+                                "value": "afternoon"
+                            }
+                        ],
+                        "id": "deskTimeSlot"                    
+                    },
+                    {
+                        "type": "ColumnSet",
+                        "columns": [
+                            {
+                                "type": "Column",
+                                "width": "auto",
+                                "id": "freeButton",
+                                "items": [
+                                    {
+                                        "type": "Image",
+                                        "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAAByFJREFUaEPlW2toFUcU/o6JWCORqvFHQbAtitKiYltBkFQkL6wR6yMNoqJgmgSRhih5GSRq0OQm+CqCuVFB0SAxRhtqKyYGsSEgaCsqLYrSVhD7Q2yKwUuVhClnvLvdrHt39+7O2nvp/Lx35sz55pw5c15LCGgIISYAWADgYwAfAHgfwCcxtrsB4FcAvwD4EUA/EQ0EwRqpJCqEeBdAAYClADJ90u4D8C2ADiL63SctfbkSwEKIzwAUA1imijETnS4AR4joO7/0fQEWQiwBUKVAmm5xsNSbiOiC2wXmeZ4ACyH4PjYA+MLrxj7XdQCoJiK+93GNuAELIb4E8DWAt+LaSf3kvwGUEVFrPKTjAiyEaAFQEs8GdnOFEHj06BH6+vrQ09ODu3fv4tq1a/qS+fPnY+bMmcjJyUFmZiamTJkCotdYDhNRqVueXAEWQrwN4AyAHLeE7ea9ePECly9fRigUkmDdDgZdVVWF7OxsjBkzxrish68XEf3lRMsRsBDiHQBsJD5yIub0P0v05s2bqKurw4ULnu0O8vPzsXPnTsydO9co8Z8A5BPRH3Z82AKOSrZXBViWamtrK2prazE4OKjzNGvWLKxduxZZWVmYNm0axo8fL0Hw4Tx79gwPHjxAb28vTp06hTt37ujr0tPTsXv3bhQXFxulzaCz7CTtBLhbhRo/f/5cAj148KDO8Lx58yTDixYtQmpqqpNyYGhoCFeuXJF0rl+/rs8vKyuTdMaNG6f91kNEubEIxgSsykCZwbJkKioqsGXLFiOTjoC1CUzv8OHD2LVrl64pmzZtQlNTk5FeTENmCVgIwV5T2DUXMSayVPbu3Yvq6mo5Y+rUqdi3bx+WL19uZW1db8fqfv78eXloDx8+lOsaGxuxdetWo7YUE9ERM9HXAEedip9VvLNXr17F+vXrJVMs2ZaWFqxevdoXWA0Agz59+jRKS0ulpPkwT5w4gYULF2pT+J3+0OycWAHm54cDAF9jYGAAJSUl6Ohgp8hSAr7o82KzBhUUFCAcDmPCBA7U5DhDRIXGjUYAFkLkRyMU38ycO3cOK1eulHRYhZmRyZMn+6ZrJmA+2M7OTqxYscI4jZ8qPegwA/5BRSDAhmXz5s04fvy4VOWzZ88iNzem4fR9CN3d3Vi1apVU7Q0bNuDQoUNGA9ZHRJ9qm+iAo5GPd2/AwPbt27clA/fv35fSPXbsmFHNfAO0kvLGjRulIZs+fbo84NmzZxunLSGi7/kHI+BvVMWzbW1t0pngwVa5vLxcOUgzwf3790urzYOdlDVr1hindBHR5zrgaKbiNxVcDQ8PY/v27WhoaJDqfPHiRSxYwJmeYEd/fz8WL14s1bqmpgb19fVISUkxbvoeZ06khIUQFRxYq2ApEomAvZ+jR49izpw5aG9vx4wZM1SQtqVx7949FBYW4tatWygqKpJeXVpamnFNJRE1a4CVGCum/vTpU6lOly5dQl5eHli9J02aFDhgF/tK40XR7OKfqjhysbGqrUbQcbnvRAas7O1NcAkze0sZcB2AHaqOPYHvMEPcwYDbVSbjEthKM+AzDJiDy1gVAU+CT8B3WMNxgwELT6hsFiWgp6VzGwhgsy998uRJLFsWVFEC6Orqwrp162L50iNEEwhg3sHIRJDR0pMnT2QYyn40e3ZOhxsY4ASJh1+7eIEB5p3Yv2Wv601lPNhYOvntgQLmJ4qjpcrKSnnSnIZpbm6WiYFRo0Z5tpVWOS1O4nG0ZAoYLCWs/FnSduEUDIdtHLlouWgVWUs+RD44jaZFqjbWYcpnSanjYQfWyAXnpbkCYVE2sWQ2jry0neZIx0Opa8m7mSXLUuVU7dixYyXIACsPTtdEupZKgwcrsJwQ4KwH368Aa0tOYPXggXOaSsJDO7DGcgrXmbhscuDAARk3ux021UO3JCYqSwC4BWvkTFF92C3YVwkAnu03xeMFrFsuFc4bkeLhdiNPSbwkAcvn9m8SLyrluNO0SQR2ZJo2Cph7rVz3QSURWIanl1s8lVoYLFcCt23bJt9Ufme1p8dNcVvhvXRDyrrUEpUyN5rZlluSDOyrt9fQyGZVLo3palqB3bNnj6zRJqBkGSz3aY5onnNdEE9CsO4K4lHV5m47vcMtCcEyjBKrLj3HppYkBRtfU4tm+l6+fNkTDoezjdY4we8ss+6tbQlAakZGRnkkEmmIRCIp/PQkAVjPjWlcWOXWpRCA9LS0tOFQKJSSwNaYJeur9ZDrm20A8gAMZmRk1D9+/Dh39OjR2W5e+v9gju/mUpZwEYDaaCM4N3gNqerOU3wg6tuHTTEsqzo3TSZCg/hXVt12dgfq2D5stTjardeoooHNo7S5ea7mjXwCYJI258M46ez3kx23uLmbPOTn6xZPEjZzF+3xYu8sqIoZf8bTqvVauT0dq3lKAGuE/zcfasW45wn5Kd4/YuBR4yLlqw0AAAAASUVORK5CYII=",
+                                        "horizontalAlignment": "Center",
+                                        "selectAction": {
+                                            "type": "Action.Submit",
+                                            "title": "Free Desk",
+                                            "id": "FreeDesk",
+                                            "data":{
+                                                "deskLocation": "{{deskLocation.value}}",
+                                                "deskDate": "{{deskDate.value}}",
+                                                "deskTimeSlot": "{{deskTimeSlot.value}}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "TextBlock",
+                                        "wrap": true,
+                                        "text": "Free Desk",
+                                        "horizontalAlignment": "Center"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "Column",
+                                "width": "auto",
+                                "id": "spacer",
+                                "items": [
+                                    {
+                                        "type": "Image",
+                                        "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAAA2tJREFUaEPtWy1wU0EQ/j5HHcXhAAkOcAwYBgRpBgygIklRIREUUNTxJ1qiaCqjSA0dCIIOhg6KggMJOBzBBbfMZi6Z5PUl7+9yL+T6ZHK3u9/t/ezufUdM6RORRQDnAJwBcBLACQBnx6jbA/AdwDcAnwF8JNmZhmm0KVREjgG4DqAI4HxG2bsAXgPYIvkzo6xBdyuAReQKgDKAq7YMC8jZBrBJsp1VfibAIlIAcM+CN+PiUK8/Jfkmbodgu1SARUTX4yMAN9IqzthvC8B9krruE32JAYvILQB1AIcSabLf+C+AOyQbSUQnAiwiLwAsJ1HgoO0Gydtx9cQCLCKHAbQAXIor2HG7HV1eJP9E6Y0ELCJHAegmcTpKWM7/fwGwRPLXJDsmAjaefW8LbLfbRaPRwNraWs+mWq2GcrmMhYUFW2OloC9O8nQU4He2prGIoF6vo1qtjoBbX19HpVIBGTnZ4g7KDsnL4xqP1WJ7g+p0OiiVSmi3R2OHQqGAZrOJxUWNRK19YzeyUMAiolHThjX1ABwDVtPLJDcjAw8TVHy1fc46nNJ9jHpOnwoGJ/s8LCJ6/GgCYP1zsGkFbW6RvDn84whgEVkyGYp1sDkK1KNqsHEEAX9wmAi4GoNdkhf6ygaATeaTOgtxZX1KPQWSb7XvMOBXU8xnU9pprds2yWsDwKZS8cOa+NkUdFwrJz0Pi8hdTaxn005rVq2QfNYHPI+bVXCkepsXTXXxt7VxnG1BRxTwPJ6944a9qIAfAlidbcdYs25VAb/MsRhnDUlMQS0F/GnCjUBMOf9Nsz0FLK7MzSF52AfNGeAc0sNQPzoDnEMB4ABwL5Z2tYa9m9I6urOyaXl3LHkXeHgXWnqXPGjJ35/00FQ8/CkA+FriUbqRP0U842V/yrQGsHKtMvOgXKWaCfUMrlv8vWoxXlai2bxdtxSHiWxh16VTCzVzSB6UpzlCngsDrCw7fy7EzdRWtl0ihlvUJpJDxWM5jKV3QGoZ9pSI+ENbMlNbKYf+ENMMaH+oh/3p7RW5NLCm/aAPB0ArS++5beJa1LEW8r8SzyphbLtJslIxOg1b7/G0CGwxwCt57oGTJwABb2s9bMUht0sfeTzJ8rollYeDHjAcL43OpvmMp9HnWsWYAWObWAE8tJv78VArbDhn9SneP85Y3rYOsL7dAAAAAElFTkSuQmCC"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "Column",
+                                "width": "auto",
+                                "id": "specificButton",
+                                "items": [
+                                    {
+                                        "type": "Image",
+                                        "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAAB4tJREFUaEPtW2loVUcU/kYE60qNPzTg0lRETFExrRuSioZGbaJWMCniClqNW4tik1SERBCbpKK0bolVcEWa/DCxSdVIFBsibo0oNCJiUxeI/tAU1wrilG96X3rfzbvv3Tt31Aadn+/dOXO+e+acOXPOdwVe0pBSdgcwBsCHABIBvA/gI5flLgD4A0ADgN8A1Akhml+GasKkUCnlewAyAEwGkBxQdi2AnwGUCSH+DCirZboRwFLKTwEsBDDVlGIOORUAfhRCVAWVHwiwlDINQI4Ba3rFQasXCSEqvU5wPqcFWEpJf/wWQKbuwgHnlQHIFULQ730N34CllF8A+AHAO75WMv/w3wC+EkLs8CPaF2ApZTGARX4W4LM3b97E3r17sX//fly9ehUDBw7ErFmzMGfOHPTt29evOOfzJUKILK9CPAGWUr4LoBTAJ14F8zkpJQ4dOoSVK1fixo0brab269cPGzduxLRp0yCEJ1Xclj9O9xJC/BVLv5irSCnjATBIJMUS5vz/1KlTmDt3bkSwoWcJes+ePRg7dqxf8c7n6wGkCyGaogmKCtiybI0O2ObmZsyfP19ZmGPVqlXK0vHx8WhqalKW3bBhg/qPFt61axe6d2euEmgQdEo0S8cCXO13G4fUPXPmDFJTU/Hw4UPlq5s3b0a3bt1a0Dx48ADLly9Xvt21a1dUV1dj1KhRgdBak48LIVLdBLkC1g1QoYUOHDigAhMHtyxBOwfBcstzMKDNnDnTBGDKcA1kEQFLKZk1lQRZ/TUDpuoLhRA/OjG0AmwlFb8HPWdf45YOYeQ5/YEzOYkEmMcPLwCBxmsKWk6dS4UQn9t/DAMspUy3bihaYJ8+fYrS0lJs374dZ8+e9S1j5MiRWLx4MTIzM9GxY0ff810m8KhquXQ4Af+qexF4/PgxsrOzsW3btsCKLlmyBEVFRejcuXNgWQBqhRAfhwS1ALZuPtq3EJ6jCxYsMKGgkrFz5051jhsaaUKIXyjLDrhc9z7Ls3bp0qXYt2+fSiyKi4uRnp6Odu3aedb3xYsXqKysRFZWlkpMZs+eja1bt6oz2sCoEEJ81gLYqlQ06gq+d++eOkOPHTuGCRMmgEdSjx49fIszJcdl4QRWTpSFpZRf82LtW0NrgilFTclxwZEthPguBFg7WFG4KUVNyXEBrIKXsKqL93Wt24YAU9U4Ag509rYxwJMJOA9A/hti4XwC/iloMc6U75mSE8V4pQR8PkpHwJPhTSlqSk4UpS8QsPSEKspDphQ1JScanreAdaxtyjKm5Ly1sO0NvN3SOlu6DdyWWmAZOZYoLdJ92H5zcvNP++/2l234PhwSrY6lwIkHpUWqeOgCNlzxsL9HlXgETi1DEp89e4aysjKsWbNGtVf8AmbbZd26dcjIyECHDh10vCvWHJVaBr482FfxsnW9vIhYmmv+ry4PbOgEuh62IcBxRgoAbQTwvwUAKhu0xEMZz58/V5WPixcvIj8/X9WlvWxduwuwLs25w4YNUzWx9u3ba+7ciNPCSjykG/kq4vHOcffuXZw4cQLl5eWoqanB/fvhnuEXsF3NuLg4pKSkqJeWlpaGnj17Bm2a/1fEs6zsqUzL7gLLqSUlJQpktBEEsFNucnKyaq+y/KvRlQgv01qAybVy5UHRoidPnkRubi7On+cVOnywfjxixAgMHToUR44cwZUrV3xv6UGDBmHSpEm4dOkSzp07p3rLzjF8+HAUFBRg3Lhxfize0m7x1Gqhf7K4vnr16jAlBg8erLoDEydORP/+/ZXPmTqWuOb169dx9OhRHDx4MKxXxZe7fv16VbT34OeRWy2WlUk0a9VuqaioUJ2A0BvntmIfafTo0a0WNAXYbll2JU6fPo3CwkLlThwEzU7H1KkxyX+T7US2SO3SsFSTKeOyZcuwe/dutRDfLLkabpnQywBsz+TIDeFO45g3bx62bNkSrelGnmYYeS5mQ9wOgFGTbRRGTLfBvjB3Q1VVlW8fZjSm1aKRW3gysK3DgBmjreOtIW5tbbLtFMPNr4U5h5G8vr5ekdDY6+3SpYurbz969Ej1lElWS0pKihqBmav7sPCiSCw9T6QWMmymT58e5sN5eXlKQT8dQt0sgj7MF7h27VqvPuyP1BJSTEqpaEuMmGTirFixIixKMzOaMWNGWJTWBeWcFytKb9q0STGAIkRpPdqStbVJOVTENK/nMLlWiYmJ6NOnDxISEtQW7dSpU8Styq3/5MkT5QKNjY24desWGhoaQEKM5jkcjJhmgQ6jHlI5ppM8ImprSV9+NYOZVk5ODsaPH+/m58Gph7at3YpcSovfvn1b+dThw4dRV1cXMTPSfR08Z8eMGYMpU6aodLJ3797RMitz5FK7wtHYefS5O3fuqMh8+fJlRVtgisiAc+3aNVc27YABA1TgY0pKusSQIUNUxO7Vq5eXLIrqmacPO0CTpfd9UOKaruVt83jOfhmJbRdNdkz6cKTJFluvwASBTRM4yXPfvJJPABzWZj0sW5fbpQGWUbIwyNctWhZ2KmpxvJidxczkNUByCj/j2RHiWmnKUNOMALZF8zfjQy0XP/9ffor3DzT+mPJ3SCHvAAAAAElFTkSuQmCC",
+                                        "horizontalAlignment": "Center",
+                                        "selectAction": {
+                                            "type": "Action.Submit",
+                                            "title": "Specific Desk",
+                                            "id": "SpecificDesk",
+                                            "data":{
+                                                "deskLocation": "{{deskLocation.value}}",
+                                                "deskDate": "{{deskDate.value}}",
+                                                "deskTimeSlot": "{{deskTimeSlot.value}}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "TextBlock",
+                                        "text": "Specific Desk",
+                                        "wrap": true,
+                                        "horizontalAlignment": "Center"
+                                    }
+                                ]
+                            }
+                        ],
+                        "horizontalAlignment": "Center"
+                    }
+                ]
+              }
+          ]
+      }
+ ]
+}

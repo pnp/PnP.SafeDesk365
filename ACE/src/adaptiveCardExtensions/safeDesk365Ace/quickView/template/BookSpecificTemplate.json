@@ -6,40 +6,34 @@
       {
           "type": "Container",
           "items": [
-              {
-                  "type": "TextBlock",
-                  "text": "Choose your desk:",
-                  "wrap": true
-              },
-              {
+                {
+                    "type": "TextBlock",
+                    "text": "Choose your desk:",
+                    "wrap": true
+                },
+                {
                 "type": "Input.ChoiceSet",
                 "choices": [
                     {
-                        "$data": "${$root['locations']}",
-                        "title": "${name} [${address}]",
-                        "value": "${id}"
-                    }
-                ],
-                "placeholder": "Select location",
-                "id": "specificDeskLocation"
-            },
-            {
-                "type": "Input.Date",
-                "id": "specificDeskDate"
-            },
-            {
-                "type": "Input.ChoiceSet",
-                "choices": [
-                    {
-                        "$data": "${$root['desks']}",
-                        "title": "${description}",
+                        "$data": "${desks}",
+                        "title": "${code}",
                         "value": "${code}"
                     }
                 ],
                 "placeholder": "Select desk",
-                "id": "specificDeskDesk"
+                "id": "specificDesk"
             }
         ]
       }
+  ],
+  "actions": [
+    {
+        "type": "Action.Submit",
+        "title": "Book!",
+        "id": "Submit",
+        "data": {
+            "specificDesk": "{{specificDesk.value}}"
+        }
+    }
   ]
 }

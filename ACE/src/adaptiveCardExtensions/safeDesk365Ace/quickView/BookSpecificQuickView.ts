@@ -1,12 +1,14 @@
-import { ISPFxAdaptiveCard, BaseAdaptiveCardView } from '@microsoft/sp-adaptive-card-extension-base';
+import { ISPFxAdaptiveCard, BaseAdaptiveCardView, IActionArguments } from '@microsoft/sp-adaptive-card-extension-base';
 import * as strings from 'SafeDesk365AceAdaptiveCardExtensionStrings';
 import { ISafeDesk365AceAdaptiveCardExtensionProps } from '../ISafeDesk365AceAdaptiveCardExtensionProps';
 import { ISafeDesk365AceAdaptiveCardExtensionState } from '../ISafeDesk365AceAdaptiveCardExtensionState';
-import { Location, Desk } from 'safedesk365-sdk';
+import { DeskAvailability } from 'safedesk365-sdk';
+import { 
+  QUICK_VIEW_BOOK_DONE_ID
+} from '../SafeDesk365AceAdaptiveCardExtension';
 
 export interface IBookSpecificQuickViewData {
-  locations: Location[];
-  desks: Desk[];
+  desks: DeskAvailability[];
 }
 
 export class BookSpecificQuickView extends BaseAdaptiveCardView<
@@ -15,13 +17,36 @@ export class BookSpecificQuickView extends BaseAdaptiveCardView<
   IBookSpecificQuickViewData
 > {
   public get data(): IBookSpecificQuickViewData {
+
+    console.log(this.state);
+
     return {
-      locations: this.state.locations,
-      desks: undefined
+      desks: this.state.desks,
     };
   }
 
   public get template(): ISPFxAdaptiveCard {
     return require('./template/BookSpecificTemplate.json');
+  }
+
+  public async onAction(action: IActionArguments | any): Promise<void> {
+    if (action.id == "Submit") {
+
+      const deskCode: string = action.data.specificDesk;
+
+      // Here we create the booking, upon confirmation from the user
+      const bookingId: number = await this.properties.safeDesk365.bookDesk(
+        this.context.pageContext.user.email,
+        this.state.bookingLocation, 
+        deskCode, 
+        this.state.bookingDate, 
+        this.state.bookingTimeSlot);
+
+      this.setState({
+        bookingId: bookingId
+      });
+
+      this.quickViewNavigator.replace(QUICK_VIEW_BOOK_DONE_ID);
+    }
   }
 }

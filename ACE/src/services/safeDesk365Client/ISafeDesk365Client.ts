@@ -2,7 +2,8 @@ import { TimeSlot } from './TimeSlot';
 import { 
     Location, 
     Desk, 
-    DeskAvailability 
+    DeskAvailability,
+    Booking
 } from "safedesk365-sdk";
 
 /**
@@ -24,22 +25,34 @@ export interface ISafeDesk365Client {
      * @returns The whole list of locations
      */
     getLocations: () => Promise<Location[]>;
- 
+
     /**
-     * Returns the desks of a specific location
-     * @returns The desks of a specific location
+     * Returns the whole list of desks
+     * @returns The whole list of desks
      */
-    getDesksByLocation: (location: string) => Promise<Desk[]>;
+    getDesks: () => Promise<Desk[]>;
+
+    /**
+     * Returns the whole list of bookings
+     * @returns The whole list of bookings
+     */
+    getBookings: () => Promise<Booking[]>;
 
     /**
      * Return the very first free spot in a specific location and date/slot
      * @returns The very first free spot in a specific location and date/slot, if any
      */
-    getFreeDesk: (location: string, date: Date, timeSlot: TimeSlot) => Promise<DeskAvailability | undefined>;
- 
+    getFreeDesk: (location: string, date: string, timeSlot: TimeSlot) => Promise<DeskAvailability | undefined>;
+
     /**
-     * Checks if a specific spot in a target location and date/slot is available or not
-     * @returns Whether the requested desk is available in the target location and date/slot, if any
+     * Return the list of free desks in a specific location and date/slot
+     * @returns The list of free desks in a specific location and date/slot, if any
      */
-    checkDeskAvailability: (location: string, date: Date, timeSlot: TimeSlot, desk: string) => Promise<DeskAvailability | undefined>;
+    getFreeDesks: (locationId: string, date: string, timeSlot: TimeSlot) => Promise<DeskAvailability[] | undefined>;
+
+    /**
+     * Creates a booking for a specific user, location, desk, date, and time slot
+     * @returns The id of the created booking
+     */
+    bookDesk: (user: string, locationId: string, deskCode: string, date: string, timeSlot: TimeSlot) => Promise<number>;
 }
