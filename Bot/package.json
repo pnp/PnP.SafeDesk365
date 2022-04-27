@@ -26,7 +26,8 @@
     "morgan": "1.9.1",
     "msteams-react-base-component": "^3.1.1",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "safedesk365-sdk": "^0.0.10"
   },
   "devDependencies": {
     "@types/debug": "4.1.7",
