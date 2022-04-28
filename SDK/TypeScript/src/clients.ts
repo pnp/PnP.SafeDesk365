@@ -27,9 +27,9 @@ export class SafeDesk365 {
      */
     GetAllBookings(userEmail?: string | undefined, location?: string | undefined): Promise<Booking[]> {
         let url_ = this.baseUrl + "/api/bookings?";
-        if (userEmail !== undefined && userEmail !== null)
+        if (userEmail !== undefined || userEmail !== null)
             url_ += "userEmail=" + encodeURIComponent("" + userEmail) + "&";
-        else if (location !== undefined && location !== null)
+        else if (location !== undefined || location !== null)
             url_ += "location=" + encodeURIComponent("" + location) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -191,9 +191,9 @@ export class SafeDesk365 {
      */
     GetUpcomingBookings(userEmail?: string | undefined, location?: string | undefined): Promise<Booking[]> {
         let url_ = this.baseUrl + "/api/bookings/upcoming?";
-        if (userEmail !== undefined && userEmail !== null)
+        if (userEmail !== undefined || userEmail !== null)
             url_ += "userEmail=" + encodeURIComponent("" + userEmail) + "&";
-        if (location !== undefined && location !== null)
+        if (location !== undefined || location !== null)
             url_ += "location=" + encodeURIComponent("" + location) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -228,6 +228,7 @@ export class SafeDesk365 {
     }
 
     /**
+     * Needs an ID retrieved from GetUpcomingdeskAvailabilities and a user's email 
      * @return Success
      */
     BookAvailability(id: number, userEmail: string): Promise<number> {
@@ -360,7 +361,7 @@ export class SafeDesk365 {
         let url_ = this.baseUrl + "/api/deskAvailabilities/upcoming?";
         //if (selectedDate === null)
         //    throw new Error("The parameter 'selectedDate' cannot be null.");
-        if (selectedDate !== null && selectedDate !== undefined)
+        if (selectedDate !== null || selectedDate !== undefined)
             url_ += "selectedDate=" + encodeURIComponent("" + selectedDate) + "&";
         //if (location === null)
           //  throw new Error("The parameter 'location' cannot be null.");
