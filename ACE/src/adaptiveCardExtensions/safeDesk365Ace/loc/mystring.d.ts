@@ -6,6 +6,7 @@ declare interface ISafeDesk365AceAdaptiveCardExtensionStrings {
   PrimaryText: string;
   Description: string;
   QuickViewButton: string;
+  RefreshQuickViewButton: string;
 
   // ACE Buttons
   BookDeskButton: string;

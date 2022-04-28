@@ -15,7 +15,7 @@ import {
   QUICK_VIEW_CHECKOUT_ID
 } from '../SafeDesk365AceAdaptiveCardExtension';
 
-export class CardView extends BaseImageCardView<ISafeDesk365AceAdaptiveCardExtensionProps, ISafeDesk365AceAdaptiveCardExtensionState> {
+export class WelcomeCardView extends BaseImageCardView<ISafeDesk365AceAdaptiveCardExtensionProps, ISafeDesk365AceAdaptiveCardExtensionState> {
   /**
    * Buttons will not be visible if card size is 'Medium' with Image Card View.
    * It will support up to two buttons for 'Large' card size.

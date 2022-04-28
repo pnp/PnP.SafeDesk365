@@ -36,11 +36,11 @@
                         "choices": [
                             {
                                 "title": "Morning",
-                                "value": "morning"
+                                "value": "Morning"
                             },
                             {
                                 "title": "Afternoon",
-                                "value": "afternoon"
+                                "value": "Afternoon"
                             }
                         ],
                         "id": "deskTimeSlot"                    

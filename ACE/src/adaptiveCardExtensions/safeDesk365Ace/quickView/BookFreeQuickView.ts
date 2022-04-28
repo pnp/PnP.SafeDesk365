@@ -3,9 +3,7 @@ import * as strings from 'SafeDesk365AceAdaptiveCardExtensionStrings';
 import { ISafeDesk365AceAdaptiveCardExtensionProps } from '../ISafeDesk365AceAdaptiveCardExtensionProps';
 import { ISafeDesk365AceAdaptiveCardExtensionState } from '../ISafeDesk365AceAdaptiveCardExtensionState';
 import { DeskAvailability } from 'safedesk365-sdk';
-import { 
-  QUICK_VIEW_BOOK_DONE_ID
-} from '../SafeDesk365AceAdaptiveCardExtension';
+import { CARD_VIEW_BOOKING_DONE_ID } from '../SafeDesk365AceAdaptiveCardExtension';
 
 export interface IBookFreeQuickViewData {
   deskAvailability: DeskAvailability;
@@ -17,9 +15,6 @@ export class BookFreeQuickView extends BaseAdaptiveCardView<
   IBookFreeQuickViewData
 > {
   public get data(): IBookFreeQuickViewData {
-
-    console.log(this.state);
-
     return {
       deskAvailability: this.state.deskAvailability
     };
@@ -44,7 +39,8 @@ export class BookFreeQuickView extends BaseAdaptiveCardView<
         bookingId: bookingId
       });
 
-      this.quickViewNavigator.replace(QUICK_VIEW_BOOK_DONE_ID);
+      this.quickViewNavigator.close();
+      this.cardNavigator.replace(CARD_VIEW_BOOKING_DONE_ID);
     }
   }
 }

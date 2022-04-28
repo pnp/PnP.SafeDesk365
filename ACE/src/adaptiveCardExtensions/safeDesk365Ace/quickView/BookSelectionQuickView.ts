@@ -39,6 +39,7 @@ export class BookSelectionQuickView extends BaseAdaptiveCardView<
       this.setState({
         bookingLocation: action.data.deskLocation,
         bookingDate: action.data.deskDate,
+        bookingTimeSlot: action.data.deskTimeSlot,
         desks: desks
       });
 
@@ -54,6 +55,7 @@ export class BookSelectionQuickView extends BaseAdaptiveCardView<
       this.setState({
         bookingLocation: action.data.deskLocation,
         bookingDate: action.data.deskDate,
+        bookingTimeSlot: action.data.deskTimeSlot,
         deskAvailability: freeDesk
       });
 

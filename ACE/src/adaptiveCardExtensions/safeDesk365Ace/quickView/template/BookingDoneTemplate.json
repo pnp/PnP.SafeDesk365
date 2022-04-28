@@ -20,5 +20,14 @@
                 }
             ]
         }
+    ],
+    "actions": [
+      {
+          "type": "Action.Submit",
+          "title": "Done!",
+          "id": "Submit",
+          "data": {
+          }
+      }
     ]
 }

@@ -7,6 +7,7 @@ define([], function() {
     "PrimaryText": "Book your desk or check-in/out",
     "Description": "SafeDesk365 Adaptive Card Extension",
     "QuickViewButton": "Quick view",
+    "RefreshQuickViewButton": "Refresh",
     "BookDeskButton": "Book",
     "CheckInButton": "Check-in",
     "CheckOutButton": "Check-out",

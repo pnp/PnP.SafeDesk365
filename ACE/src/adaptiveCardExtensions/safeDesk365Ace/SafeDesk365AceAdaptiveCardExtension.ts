@@ -1,6 +1,7 @@
 import { IPropertyPaneConfiguration } from '@microsoft/sp-property-pane';
 import { BaseAdaptiveCardExtension } from '@microsoft/sp-adaptive-card-extension-base';
-import { CardView } from './cardView/CardView';
+import { WelcomeCardView } from './cardView/WelcomeCardView';
+import { BookingDoneCardView } from './cardView/BookingDoneCardView';
 import { BookSelectionQuickView } from './quickView/BookSelectionQuickView';
 import { BookFreeQuickView } from './quickView/BookFreeQuickView';
 import { BookSpecificQuickView } from './quickView/BookSpecificQuickView';
@@ -15,7 +16,8 @@ import { ISafeDesk365AceAdaptiveCardExtensionState } from './ISafeDesk365AceAdap
 import { SafeDesk365Client } from '../../services/safeDesk365Client/SafeDesk365Client';
 import { AadHttpClient, HttpClientResponse } from '@microsoft/sp-http';
 
-const CARD_VIEW_REGISTRY_ID: string = 'SafeDesk365Ace_CARD_VIEW';
+export const CARD_VIEW_WELCOME_ID: string = 'SafeDesk365Ace_CV_WELCOME';
+export const CARD_VIEW_BOOKING_DONE_ID: string = 'SafeDesk365Ace_CV_BOOKING_DONE';
 export const QUICK_VIEW_CHECKIN_ID: string = 'SafeDesk365Ace_QV_CHECKIN';
 export const QUICK_VIEW_CHECKOUT_ID: string = 'SafeDesk365Ace_QV_CHECKOUT';
 export const QUICK_VIEW_BOOK_SELECTION_ID: string = 'SafeDesk365Ace_QV_BOOK_SELECTION';
@@ -37,7 +39,8 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
       desks: undefined
     };
 
-    this.cardNavigator.register(CARD_VIEW_REGISTRY_ID, () => new CardView());
+    this.cardNavigator.register(CARD_VIEW_WELCOME_ID, () => new WelcomeCardView());
+    this.cardNavigator.register(CARD_VIEW_BOOKING_DONE_ID, () => new BookingDoneCardView());
     this.quickViewNavigator.register(QUICK_VIEW_CHECKIN_ID, () => new CheckInQuickView());
     this.quickViewNavigator.register(QUICK_VIEW_CHECKOUT_ID, () => new CheckOutQuickView());
     this.quickViewNavigator.register(QUICK_VIEW_BOOK_SELECTION_ID, () => new BookSelectionQuickView());
@@ -63,7 +66,7 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
   }
 
   protected renderCard(): string | undefined {
-    return CARD_VIEW_REGISTRY_ID;
+    return CARD_VIEW_WELCOME_ID;
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
