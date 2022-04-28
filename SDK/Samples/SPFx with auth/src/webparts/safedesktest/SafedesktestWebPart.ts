@@ -11,7 +11,7 @@ import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import * as strings from 'SafedesktestWebPartStrings';
 import Safedesktest from './components/Safedesktest';
 import { ISafedesktestProps } from './components/ISafedesktestProps';
-import { SafeDesk365, Location } from "safedesk365-sdk"
+import { SafeDesk365, Location, DeskAvailability, Booking } from "safedesk365-sdk"
 import { AadHttpClient, HttpClientResponse, AadTokenProvider } from '@microsoft/sp-http';
 
 export interface ISafedesktestWebPartProps {
@@ -49,6 +49,37 @@ export default class SafedesktestWebPart extends BaseClientSideWebPart<ISafedesk
           var unauthenticatedSafeDesk = new SafeDesk365("https://safedesk365-test.azurewebsites.net/");
           unauthenticatedSafeDesk.GetLocations().then((c: Location[]) => {
             this.unAuthLocation = c[1].name;
+            console.log("Unauthenticated location" + c)
+            const element: React.ReactElement<ISafedesktestProps> = React.createElement(
+              Safedesktest,
+              {
+                description: this.properties.description,
+                isDarkTheme: this._isDarkTheme,
+                environmentMessage: this._environmentMessage,
+                hasTeamsContext: !!this.context.sdks.microsoftTeams,
+                userDisplayName: this.context.pageContext.user.displayName,
+                authLocation: this.authLocation,
+                unAuthLocation: this.unAuthLocation
+              }
+            );
+            ReactDom.render(element, this.domElement);
+          });
+        });
+      });
+
+      this.context.aadTokenProviderFactory.getTokenProvider()
+      .then((tokenProvider: AadTokenProvider): Promise<string> => {
+        // retrieve access token for the enterprise API secured with Azure AD
+        return tokenProvider.getToken(tokenId);
+      })
+      .then((accessToken: string): void => {
+        var c = new SafeDesk365("https://safedesk365-pro.azurewebsites.net/", accessToken);
+        c.GetUpcomingdeskAvailabilities().then((c: DeskAvailability[]) => {
+          this.authLocation = c[0].description;
+          console.log("authenticated location" + c)
+          var unauthenticatedSafeDesk = new SafeDesk365("https://safedesk365-test.azurewebsites.net/");
+          unauthenticatedSafeDesk.BookAvailability(c[0].id, "rick@zxqg4.onmicrosoft.com").then((c: Number) => {
+            this.unAuthLocation = c;
             console.log("Unauthenticated location" + c)
             const element: React.ReactElement<ISafedesktestProps> = React.createElement(
               Safedesktest,

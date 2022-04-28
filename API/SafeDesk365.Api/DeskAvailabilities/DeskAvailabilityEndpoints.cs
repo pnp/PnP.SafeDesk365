@@ -5,8 +5,19 @@ namespace SafeDesk365.Api.DeskAvailabilities
     {
         public static void MapDeskAvailabilityEndpoints(this WebApplication app)
         {
-            app.MapGet("/api/deskAvailabilities/upcoming/", GetUpcomingDeskAvailabilities).RequireAuthorization();                     
+
+
+
+#if NOAUTH
+            app.MapGet("/api/deskAvailabilities/upcoming/", GetUpcomingDeskAvailabilities);
+            app.MapPost("/api/deskAvailabilities/upcoming", CreateUpcomingDeskAvailabilities);
+#endif
+
+#if RELEASE
+            app.MapGet("/api/deskAvailabilities/upcoming/", GetUpcomingDeskAvailabilities).RequireAuthorization();
             app.MapPost("/api/deskAvailabilities/upcoming", CreateUpcomingDeskAvailabilities).RequireAuthorization();
+#endif
+
         }
 
         public static void AddDeskAvailabilityServices(this IServiceCollection services)

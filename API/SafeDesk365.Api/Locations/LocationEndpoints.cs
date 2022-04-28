@@ -5,7 +5,14 @@ namespace SafeDesk365.Api.Locations
     {
         public static void MapLocationEndpoints(this WebApplication app)
         {
+#if NOAUTH
+                        app.MapGet("/api/locations", GetAllLocations);
+#endif
+
+#if RELEASE
             app.MapGet("/api/locations", GetAllLocations).RequireAuthorization();
+#endif
+
         }
 
         public static void AddLocationServices(this IServiceCollection services)

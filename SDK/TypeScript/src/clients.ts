@@ -25,15 +25,11 @@ export class SafeDesk365 {
      * @param location (optional) 
      * @return Success
      */
-    GetAllBookings(userEmail: string | undefined, location: string | undefined): Promise<Booking[]> {
+    GetAllBookings(userEmail?: string | undefined, location?: string | undefined): Promise<Booking[]> {
         let url_ = this.baseUrl + "/api/bookings?";
-        if (userEmail === null)
-            throw new Error("The parameter 'userEmail' cannot be null.");
-        else if (userEmail !== undefined)
+        if (userEmail !== undefined && userEmail !== null)
             url_ += "userEmail=" + encodeURIComponent("" + userEmail) + "&";
-        if (location === null)
-            throw new Error("The parameter 'location' cannot be null.");
-        else if (location !== undefined)
+        else if (location !== undefined && location !== null)
             url_ += "location=" + encodeURIComponent("" + location) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -70,7 +66,7 @@ export class SafeDesk365 {
     /**
      * @return Success
      */
-    CreateBooking(body: Booking): Promise<number> {
+    CreateSpecificBooking(body: Booking): Promise<number> {
         let url_ = this.baseUrl + "/api/bookings";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -193,15 +189,11 @@ export class SafeDesk365 {
      * @param location (optional) 
      * @return Success
      */
-    GetUpcomingBookings(userEmail: string | undefined, location: string | undefined): Promise<Booking[]> {
+    GetUpcomingBookings(userEmail?: string | undefined, location?: string | undefined): Promise<Booking[]> {
         let url_ = this.baseUrl + "/api/bookings/upcoming?";
-        if (userEmail === null)
-            throw new Error("The parameter 'userEmail' cannot be null.");
-        else if (userEmail !== undefined)
+        if (userEmail !== undefined && userEmail !== null)
             url_ += "userEmail=" + encodeURIComponent("" + userEmail) + "&";
-        if (location === null)
-            throw new Error("The parameter 'location' cannot be null.");
-        else if (location !== undefined)
+        if (location !== undefined && location !== null)
             url_ += "location=" + encodeURIComponent("" + location) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -238,7 +230,7 @@ export class SafeDesk365 {
     /**
      * @return Success
      */
-    GetAvailability(id: number, userEmail: string): Promise<number> {
+    BookAvailability(id: number, userEmail: string): Promise<number> {
         let url_ = this.baseUrl + "/api/bookings/availability/{id}?";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -364,15 +356,15 @@ export class SafeDesk365 {
      * @param location (optional) 
      * @return Success
      */
-    GetUpcomingdeskAvailabilities(selectedDate: string | undefined, location: string | undefined): Promise<DeskAvailability[]> {
+    GetUpcomingdeskAvailabilities(selectedDate?: string | undefined, location?: string | undefined): Promise<DeskAvailability[]> {
         let url_ = this.baseUrl + "/api/deskAvailabilities/upcoming?";
-        if (selectedDate === null)
-            throw new Error("The parameter 'selectedDate' cannot be null.");
-        else if (selectedDate !== undefined)
+        //if (selectedDate === null)
+        //    throw new Error("The parameter 'selectedDate' cannot be null.");
+        if (selectedDate !== null && selectedDate !== undefined)
             url_ += "selectedDate=" + encodeURIComponent("" + selectedDate) + "&";
-        if (location === null)
-            throw new Error("The parameter 'location' cannot be null.");
-        else if (location !== undefined)
+        //if (location === null)
+          //  throw new Error("The parameter 'location' cannot be null.");
+        if (location !== null && location !== undefined)
             url_ += "location=" + encodeURIComponent("" + location) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
