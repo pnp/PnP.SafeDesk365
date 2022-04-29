@@ -1,0 +1,17 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.14.0",
+    "libraryName": "pnp-safedesk-365-viva",
+    "libraryId": "e7c3cfff-3f23-40da-ade0-f80dc634b1a2",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "pnp-safedesk365-viva",
+    "solutionShortDescription": "pnp-safedesk365-viva description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "adaptiveCardExtension",
+    "aceTemplateType": "Image"
+  }
+}

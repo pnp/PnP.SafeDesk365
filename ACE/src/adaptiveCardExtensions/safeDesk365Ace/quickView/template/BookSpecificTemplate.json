@@ -1,0 +1,42 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.3",
+  "body": [
+      {
+          "type": "Container",
+          "items": [
+                {
+                    "type": "TextBlock",
+                    "text": "${$root.strings.ChooseDesk}",
+                    "wrap": true
+                },
+                {
+                "type": "Input.ChoiceSet",
+                "choices": [
+                    {
+                        "$data": "${desks}",
+                        "title": "${code}",
+                        "value": "${code}"
+                    }
+                ],
+                "placeholder": "${$root.strings.ChooseDeskPlaceholder}",
+                "isRequired": true,
+                "label": "Desk",
+                "errorMessage": "${$root.strings.ChooseDeskRequired}",
+                "id": "specificDesk"
+            }
+        ]
+      }
+  ],
+  "actions": [
+    {
+        "type": "Action.Submit",
+        "title": "${$root.strings.BookDeskAction}",
+        "id": "Submit",
+        "data": {
+            "specificDesk": "{{specificDesk.value}}"
+        }
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "body": [
+    {
+      "type": "TextBlock",
+      "weight": "Bolder",
+      "text": "${$root.strings.SelectBookingCheckOut}"
+    },
+    {
+      "type": "Container",
+      "spacing": "Large",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${$root.strings.BookingsListLocationColumn}",
+                  "size": "small",
+                  "weight": "Bolder",
+                  "style": "heading",
+                  "wrap": true
+                }
+              ],
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "spacing": "Large",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${$root.strings.BookingsListDeskColumn}",
+                  "size": "small",
+                  "weight": "Bolder",
+                  "style": "heading",
+                  "wrap": true
+                }
+              ],
+              "width": "50px"
+            },
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${$root.strings.BookingsListTimeSlotColumn}",
+                  "size": "small",
+                  "weight": "Bolder",
+                  "style": "heading",
+                  "wrap": true
+                }
+              ],
+              "width": "70px"
+            },
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "",
+                  "size": "small",
+                  "weight": "Bolder",
+                  "style": "heading",
+                  "wrap": true
+                }
+              ],
+              "width": "30px"
+            }
+          ]
+        }
+      ],
+      "bleed": true
+    },
+    {
+      "$data": "${todaysBookings}",
+      "type": "Container",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${location}",
+                  "size": "small",
+                  "wrap": true
+                }
+              ],
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "spacing": "Medium",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${deskCode}",
+                  "size": "small",
+                  "wrap": true
+                }
+              ],
+              "width": "50px"
+            },
+            {
+              "type": "Column",
+              "spacing": "Medium",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${timeSlot}",
+                  "size": "small",
+                  "wrap": true
+                }
+              ],
+              "width": "70px"
+            },
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAjxJREFUOE+tlT9oE3EUxz8/uFqbQajoVA2xR5eCotQLxQzHLWZILE5FnKRSKCGQmqFOB4EbJC30Dw0ScDEgVjI5VFARMmXpUQwWFQlZ5CRoKIUijTUJP7k0FVI01jZvu987Pr93733f9wTtEQBMTdPurK2t3QRCwBVgoPXaF+At8MLv9z+3bfsxYAH5fYwAHgHe1sGp3t7ei5qm9Xg8nhMHLmt73NnZ+Wnbdm13d3cD2G4lP7vAl0ARcMLh8O1SqXRpfHycvr6+Tjyq1SrZbBZVVd+trq4+Bc4BQ/tAS0p5a319PZpOp5mdnaW/v78jcGtri5mZGaamphgZGUkJIZ657WoCFxcXC7FY7H5Hwj+SS0tLyenp6ctCCPFKSnn9OLDfAxHitVBV9X0qlRrWNO1YTNu2iUajH4Tf7/82Pz9/NhBwFXP0yOfzxOPxijAMo2pZ1sluAE3T/CGCwaA0TZNuAC3LovvArn9yt4ZSLBZZWVnZaMomk8kM/28Pa7UaiqIghLsbIKWkXq9HmsLO5XJXdV0/fVjRbG5uEovFmJiYwDAMGo0GyWTyeyKReHik1XOryeVyru6ae18oFFheXi46jnOjzRyA6GGr3Ie6VSqK8rVUKhnAxzb7mpycHFNV9VonqK7rjI6Ouv1iYWGBubm57UqlUgbuuUZz0GDx+XwDg4ODQ4qi/NFgI5EIoVCo2bN0Ol12HGcMuAA8AOJ7IzoQUsoe4O7ffgHlcvmN1+s9U6/XnwCfAJejA+d/AXO++YLcsQr/AAAAAElFTkSuQmCC",
+                  "horizontalAlignment": "Center",
+                  "width": "20px",
+                  "selectAction": {
+                    "type": "Action.Submit",
+                    "title": "${$root.strings.CheckOut}",
+                    "id": "checkOut",
+                    "data": {
+                        "bookingId": "${id}"
+                    }
+                  }
+                }
+              ],
+              "width": "30px"
+            }
+          ]
+        }
+     ]
+    }
+  ]
+}

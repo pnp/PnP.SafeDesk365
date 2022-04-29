@@ -1,0 +1,50 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.3",
+  "body": [
+    {
+        "type": "Container",
+        "items": [
+            {
+                "type": "TextBlock",
+                "text": "${$root.strings.HereIsYourDesk}",
+                "wrap": true
+            },
+            {
+                "type": "Image",
+                "style": "default",
+                "url": "${deskAvailability.picture}",
+                "altText": "${deskAvailability.description}",
+                "size": "Small"
+            },
+            {
+                "type": "FactSet",
+                "facts": [
+                  {
+                    "title": "${$root.strings.DeskCode}",
+                    "value": "${deskAvailability.code}"
+                  },
+                  {
+                    "title": "${$root.strings.DeskDescription}",
+                    "value": "${deskAvailability.description}"
+                  },
+                  {
+                    "title": "${$root.strings.DeskCoffeeMachine}",
+                    "value": "${deskAvailability.coffeeMachineDistance} meters"
+                  }
+                ]
+            }
+        ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "${$root.strings.BookDeskAction}",
+      "id": "Submit",
+      "data":{
+      }
+    }
+  ]
+}
