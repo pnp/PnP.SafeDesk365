@@ -109,7 +109,7 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
 
     // Get today's bookings, if any
     const today: Date = new Date();
-    const todaysBookings: Booking[] = bookings
+    const todaysBookings: Booking[] = this.state.bookings
       .filter(i => 
         {
           let itemDate = new Date(i.date);

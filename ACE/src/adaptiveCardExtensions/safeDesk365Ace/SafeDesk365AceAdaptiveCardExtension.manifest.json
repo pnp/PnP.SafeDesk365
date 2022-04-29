@@ -25,7 +25,7 @@
       "title": "Safe Desk 365",
       "description": "Book your desk or check-in/out your booking",
       "iconProperty": "", 
-      "safeDesk365ApiUri": "https://safedesk365-pro.azurewebsites.net/",
+      "safeDesk365ApiUri": "https://safedesk365-pro.azurewebsites.net",
       "safeDesk365ApiUniqueUri": "SafeDesk.API.Access",
       "safeDesk365ApiId": "cd999c9a-6a4f-4187-985f-7afac488cd2d"
     }

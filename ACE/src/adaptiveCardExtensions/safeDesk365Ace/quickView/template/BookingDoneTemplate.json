@@ -8,14 +8,14 @@
             "items": [
                 {
                     "type": "TextBlock",
-                    "text": "Congrats! Your booking is now registered with ID ${bookingId}!",
+                    "text": "${$root.strings.BookingConfirmed}${bookingId}",
                     "wrap": true
                 },
                 {
                     "type": "Image",
                     "style": "default",
                     "url": "data:image/png;base64,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",
-                    "altText": "Booking done!",
+                    "altText": "${$root.strings.BookingDone}",
                     "size": "Small"
                 }
             ]
@@ -24,7 +24,7 @@
     "actions": [
       {
           "type": "Action.Submit",
-          "title": "Done!",
+          "title": "${$root.strings.DoneAction}",
           "id": "Submit",
           "data": {
           }

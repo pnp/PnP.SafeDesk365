@@ -12,7 +12,7 @@ import { ISafeDesk365AceAdaptiveCardExtensionProps } from '../ISafeDesk365AceAda
 import { ISafeDesk365AceAdaptiveCardExtensionState } from '../ISafeDesk365AceAdaptiveCardExtensionState';
 import { CARD_VIEW_WELCOME_ID } from '../SafeDesk365AceAdaptiveCardExtension';
 
-export class BookingDoneCardView extends BaseImageCardView<ISafeDesk365AceAdaptiveCardExtensionProps, ISafeDesk365AceAdaptiveCardExtensionState> {
+export class BookingCheckedOutView extends BaseImageCardView<ISafeDesk365AceAdaptiveCardExtensionProps, ISafeDesk365AceAdaptiveCardExtensionState> {
   /**
    * Buttons will not be visible if card size is 'Medium' with Image Card View.
    * It will support up to two buttons for 'Large' card size.
@@ -32,7 +32,7 @@ export class BookingDoneCardView extends BaseImageCardView<ISafeDesk365AceAdapti
 
   public get data(): IImageCardParameters {
     return {
-      primaryText: `Congrats! Your booking is now registered with ID ${this.state.bookingId}!`,
+      primaryText: `Congrats! You checked-out!`,
       imageUrl: require('../assets/great-job-164x180.png'),
       title: this.properties.title
     };
@@ -40,9 +40,6 @@ export class BookingDoneCardView extends BaseImageCardView<ISafeDesk365AceAdapti
 
   public async onAction(action: IActionArguments | any): Promise<void> {
     if (action.id == "refresh") {
-      // Refresh data
-      await this.properties.fetchData();
-
       this.setState({
         bookingDate: undefined,
         bookingLocation: undefined,
@@ -51,6 +48,9 @@ export class BookingDoneCardView extends BaseImageCardView<ISafeDesk365AceAdapti
         deskAvailability: undefined,
         desks: undefined
       });
+
+      // Refresh data
+      await this.properties.fetchData();
 
       this.cardNavigator.replace(CARD_VIEW_WELCOME_ID);
     }

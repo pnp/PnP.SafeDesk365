@@ -24,16 +24,12 @@ export class WelcomeCardView extends BaseImageCardView<ISafeDesk365AceAdaptiveCa
     
     let result: [ICardButton] | [ICardButton, ICardButton] | undefined = undefined;
     
-    if (!this.state.loading) {
+    const {
+      loading,
+      todaysBookings
+    } = this.state;
 
-      // Check if we have bookings for today
-      const today: Date = new Date();
-      var todaysBookings: Booking[] = this.state.bookings
-        .filter(i => 
-          {
-            let itemDate = new Date(i.date);
-            return (`${itemDate.getFullYear()}-${itemDate.getMonth()}-${itemDate.getDate()}` == `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`);             
-          });
+    if (!loading) {
 
       let buttons: ICardButton[] = [];
 
@@ -58,7 +54,7 @@ export class WelcomeCardView extends BaseImageCardView<ISafeDesk365AceAdaptiveCa
               }
             }
           });
-        } else {
+        } else if (todaysBookings[0].checkOutTime == null || todaysBookings[0].checkOutTime == "1900-01-01T00:00:00") {
           buttons.push({
             title: strings.CheckOutButton,
             action: {

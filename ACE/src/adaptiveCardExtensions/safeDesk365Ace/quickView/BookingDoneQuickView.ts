@@ -6,6 +6,7 @@ import { CARD_VIEW_WELCOME_ID } from '../SafeDesk365AceAdaptiveCardExtension';
 
 export interface IBookingDoneQuickViewData {
   bookingId: number;
+  strings: ISafeDesk365AceAdaptiveCardExtensionStrings;
 }
 
 export class BookingDoneQuickView extends BaseAdaptiveCardView<
@@ -15,7 +16,8 @@ export class BookingDoneQuickView extends BaseAdaptiveCardView<
 > {
   public get data(): IBookingDoneQuickViewData {
     return {
-      bookingId: this.state.bookingId
+      bookingId: this.state.bookingId,
+      strings: strings
     };
   }
 

@@ -8,7 +8,7 @@
           "items": [
               {
                   "type": "TextBlock",
-                  "text": "Choose location, date, time slot, and your desk selection flow:",
+                  "text": "${$root.strings.BookingChooseFlow}",
                   "wrap": true
               },
               {
@@ -16,7 +16,10 @@
                   "items": [
                     {
                         "type": "Input.ChoiceSet",
-                        "placeholder": "Select location",
+                        "isRequired": true,
+                        "label": "${$root.strings.BookingLocationLabel}",
+                        "errorMessage": "${$root.strings.BookingLocationRequired}",
+                        "placeholder": "${$root.strings.BookingLocationPlaceholder}",
                         "choices": [
                             {
                                 "$data": "${locations}",
@@ -28,18 +31,24 @@
                     },
                     {
                         "type": "Input.Date",
-                        "id": "deskDate"
+                        "id": "deskDate",
+                        "isRequired": true,
+                        "label": "${$root.strings.BookingDateLabel}",
+                        "errorMessage": "${$root.strings.BookingDateRequired}"
                     },
                     {
                         "type": "Input.ChoiceSet",
-                        "placeholder": "Select time slot",
+                        "isRequired": true,
+                        "label": "${$root.strings.BookingTimeSlotLabel}",
+                        "errorMessage": "${$root.strings.BookingTimeSlotRequired}",
+                        "placeholder": "${$root.strings.BookingTimeSlotPlaceholder}",
                         "choices": [
                             {
-                                "title": "Morning",
+                                "title": "${$root.strings.BookingTimeSlotMorning}",
                                 "value": "Morning"
                             },
                             {
-                                "title": "Afternoon",
+                                "title": "${$root.strings.BookingTimeSlotAfternoon}",
                                 "value": "Afternoon"
                             }
                         ],
@@ -59,7 +68,7 @@
                                         "horizontalAlignment": "Center",
                                         "selectAction": {
                                             "type": "Action.Submit",
-                                            "title": "Free Desk",
+                                            "title": "${$root.strings.BookingFreeDesk}",
                                             "id": "FreeDesk",
                                             "data":{
                                                 "deskLocation": "{{deskLocation.value}}",
@@ -71,7 +80,7 @@
                                     {
                                         "type": "TextBlock",
                                         "wrap": true,
-                                        "text": "Free Desk",
+                                        "text": "${$root.strings.BookingFreeDesk}",
                                         "horizontalAlignment": "Center"
                                     }
                                 ]
@@ -98,7 +107,7 @@
                                         "horizontalAlignment": "Center",
                                         "selectAction": {
                                             "type": "Action.Submit",
-                                            "title": "Specific Desk",
+                                            "title": "${$root.strings.BookingSpecificDesk}",
                                             "id": "SpecificDesk",
                                             "data":{
                                                 "deskLocation": "{{deskLocation.value}}",
@@ -109,7 +118,7 @@
                                     },
                                     {
                                         "type": "TextBlock",
-                                        "text": "Specific Desk",
+                                        "text": "${$root.strings.BookingSpecificDesk}",
                                         "wrap": true,
                                         "horizontalAlignment": "Center"
                                     }

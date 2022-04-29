@@ -10,6 +10,7 @@ import { Location, DeskAvailability } from 'safedesk365-sdk';
 
 export interface IBookSelectionQuickViewData {
   locations: Location[];
+  strings: ISafeDesk365AceAdaptiveCardExtensionStrings;
 }
 
 export class BookSelectionQuickView extends BaseAdaptiveCardView<
@@ -19,7 +20,8 @@ export class BookSelectionQuickView extends BaseAdaptiveCardView<
 > {
   public get data(): IBookSelectionQuickViewData {
     return {
-      locations: this.state.locations
+      locations: this.state.locations,
+      strings: strings
     };
   }
 

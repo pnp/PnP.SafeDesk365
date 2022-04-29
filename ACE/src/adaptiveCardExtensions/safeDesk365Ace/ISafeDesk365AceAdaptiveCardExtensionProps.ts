@@ -6,4 +6,5 @@ export interface ISafeDesk365AceAdaptiveCardExtensionProps {
     safeDesk365ApiUri: string;
     safeDesk365ApiId: string;
     safeDesk365: SafeDesk365Client;
+    fetchData: () => Promise<void>;
 }

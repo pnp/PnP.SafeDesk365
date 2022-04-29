@@ -55,4 +55,16 @@ export interface ISafeDesk365Client {
      * @returns The id of the created booking
      */
     bookDesk: (user: string, locationId: string, deskCode: string, date: string, timeSlot: TimeSlot) => Promise<number>;
+
+    /**
+     * Checks-in a booking
+     * @returns The checked-in booking
+     */
+     checkIn: (bookingId: number) => Promise<Booking>;
+
+    /**
+     * Checks-out a booking
+     * @returns The checked-out booking
+     */
+    checkOut: (bookingId: number) => Promise<Booking>;
 }

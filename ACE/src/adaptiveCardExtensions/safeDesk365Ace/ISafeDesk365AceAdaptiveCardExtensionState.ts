@@ -6,6 +6,7 @@ export interface ISafeDesk365AceAdaptiveCardExtensionState {
     locations?: Location[];
     desks?: DeskAvailability[];
     bookings?: Booking[]; 
+    todaysBookings?: Booking[]; 
     bookingDate?: string;
     bookingLocation?: string;
     bookingTimeSlot?: TimeSlot;

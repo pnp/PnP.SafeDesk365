@@ -8,7 +8,7 @@
         "items": [
             {
                 "type": "TextBlock",
-                "text": "Here is your free desk:",
+                "text": "${$root.strings.HereIsYourDesk}",
                 "wrap": true
             },
             {
@@ -22,15 +22,15 @@
                 "type": "FactSet",
                 "facts": [
                   {
-                    "title": "Desk code:",
+                    "title": "${$root.strings.DeskCode}",
                     "value": "${deskAvailability.code}"
                   },
                   {
-                    "title": "Description:",
+                    "title": "${$root.strings.DeskDescription}",
                     "value": "${deskAvailability.description}"
                   },
                   {
-                    "title": "Coffee machine:",
+                    "title": "${$root.strings.DeskCoffeeMachine}",
                     "value": "${deskAvailability.coffeeMachineDistance} meters"
                   }
                 ]
@@ -41,7 +41,7 @@
   "actions": [
     {
       "type": "Action.Submit",
-      "title": "Book!",
+      "title": "${$root.strings.BookDeskAction}",
       "id": "Submit",
       "data":{
       }

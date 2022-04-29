@@ -8,7 +8,7 @@
           "items": [
                 {
                     "type": "TextBlock",
-                    "text": "Choose your desk:",
+                    "text": "${$root.strings.ChooseDesk}",
                     "wrap": true
                 },
                 {
@@ -20,7 +20,10 @@
                         "value": "${code}"
                     }
                 ],
-                "placeholder": "Select desk",
+                "placeholder": "${$root.strings.ChooseDeskPlaceholder}",
+                "isRequired": true,
+                "label": "Desk",
+                "errorMessage": "${$root.strings.ChooseDeskRequired}",
                 "id": "specificDesk"
             }
         ]
@@ -29,7 +32,7 @@
   "actions": [
     {
         "type": "Action.Submit",
-        "title": "Book!",
+        "title": "${$root.strings.BookDeskAction}",
         "id": "Submit",
         "data": {
             "specificDesk": "{{specificDesk.value}}"

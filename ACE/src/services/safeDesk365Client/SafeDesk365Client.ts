@@ -83,4 +83,20 @@ export class SafeDesk365Client implements ISafeDesk365Client {
         location: locationId 
       });
     }
+
+    /**
+     * Checks-in a booking
+     * @returns The checked-in booking
+     */
+    public async checkIn(bookingId: number): Promise<Booking> {
+      return this._client.Checkin(bookingId);
+    }
+
+    /**
+     * Checks-out a booking
+     * @returns The checked-out booking
+     */
+    public async checkOut(bookingId: number): Promise<Booking> {
+      return this._client.Checkout(bookingId);
+    }
 }

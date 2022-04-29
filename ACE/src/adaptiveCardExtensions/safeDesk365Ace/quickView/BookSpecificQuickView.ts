@@ -7,6 +7,7 @@ import { CARD_VIEW_BOOKING_DONE_ID } from '../SafeDesk365AceAdaptiveCardExtensio
 
 export interface IBookSpecificQuickViewData {
   desks: DeskAvailability[];
+  strings: ISafeDesk365AceAdaptiveCardExtensionStrings;
 }
 
 export class BookSpecificQuickView extends BaseAdaptiveCardView<
@@ -17,6 +18,7 @@ export class BookSpecificQuickView extends BaseAdaptiveCardView<
   public get data(): IBookSpecificQuickViewData {
     return {
       desks: this.state.desks,
+      strings: strings
     };
   }
 
