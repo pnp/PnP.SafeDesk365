@@ -1,9 +1,9 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "pnp-safedesk-365-viva-client-side-solution",
-    "id": "e7c3cfff-3f23-40da-ade0-f80dc634b1a2",
-    "version": "1.0.0.2",
+    "name": "pnp-safedesk-365-spfx-client-side-solution",
+    "id": "3def0b4f-d85a-40d4-8c08-c84efc4f2875",
+    "version": "1.0.0.1",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
@@ -22,10 +22,10 @@
     ],
     "metadata": {
       "shortDescription": {
-        "default": "pnp-safedesk365-viva description"
+        "default": "pnp-safedesk-365-spfx description"
       },
       "longDescription": {
-        "default": "pnp-safedesk365-viva description"
+        "default": "pnp-safedesk-365-spfx description"
       },
       "screenshotPaths": [],
       "videoUrl": "",
@@ -33,14 +33,14 @@
     },
     "features": [
       {
-        "title": "pnp-safedesk-365-viva Feature",
-        "description": "The feature that activates elements of the pnp-safedesk-365-viva solution.",
-        "id": "c10cd545-ebbd-4739-9b91-2f06b99e557d",
+        "title": "pnp-safedesk-365-spfx Feature",
+        "description": "The feature that activates elements of the pnp-safedesk-365-spfx solution.",
+        "id": "e20b64bd-f098-406c-a8bc-daf7d123d071",
         "version": "1.0.0.0"
       }
     ]
   },
   "paths": {
-    "zippedPackage": "solution/pnp-safedesk-365-viva.sppkg"
+    "zippedPackage": "solution/pnp-safedesk-365-spfx.sppkg"
   }
 }

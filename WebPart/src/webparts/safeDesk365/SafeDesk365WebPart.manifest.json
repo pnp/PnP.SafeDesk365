@@ -1,8 +1,8 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
-  "id": "3b1a3f51-a4fa-438a-b29e-4a9618a03cb3",
-  "alias": "SafeDesk365AceAdaptiveCardExtension",
-  "componentType": "AdaptiveCardExtension",
+  "id": "3b77c7e1-d664-4c43-b9e2-b98cecf111d9",
+  "alias": "SafeDesk365WebPart",
+  "componentType": "WebPart",
 
   // The "*" signifies that the version should be taken from the package.json
   "version": "*",
@@ -12,19 +12,17 @@
   // Components that allow authors to embed arbitrary script code should set this to true.
   // https://support.office.com/en-us/article/Turn-scripting-capabilities-on-or-off-1f2c515f-5d7e-448a-9fd7-835da935584f
   "requiresCustomScript": false,
-  "supportedHosts": ["Dashboard"],
+  "supportedHosts": ["SharePointWebPart", "TeamsPersonalApp", "TeamsTab", "SharePointFullPage"],
   "supportsThemeVariants": true,
+
   "preconfiguredEntries": [{
-    "groupId": "bd067b1e-3ad5-4d5d-a5fe-505f07d7f59c", // Dashboard
-    "group": { "default": "Dashboard" },
-    "title": { "default": "Safe Desk 365 - ACE" },
-    "description": { "default": "Safe Desk 365 Adaptive Card Extension" },
+    "groupId": "5c03119e-3074-46fd-976b-c60198311f70", // Other
+    "group": { "default": "Other" },
+    "title": { "default": "Safe Desk 365 - Web Part" },
+    "description": { "default": "Safe Desk 365 web part to manage bookings" },
     "officeFabricIconFontName": "CityNext",
-    "cardSize": "Large",
     "properties": {
-      "title": "Safe Desk 365",
-      "description": "Book your desk or check-in/out your booking",
-      "iconProperty": "", 
+      "description": "SafeDesk365",
       "safeDesk365ApiUri": "https://safedesk365-pro.azurewebsites.net",
       "safeDesk365ApiUniqueUri": "SafeDesk.API.Access",
       "safeDesk365ApiId": "cd999c9a-6a4f-4187-985f-7afac488cd2d"

@@ -1,5 +1,5 @@
 {
-  "name": "pnp-safedesk-365-viva",
+  "name": "pnp-safedesk-365-spfx",
   "version": "0.0.1",
   "private": true,
   "main": "lib/index.js",
@@ -11,12 +11,20 @@
     "build:prod": "gulp clean && gulp bundle --ship && gulp package-solution --ship"
   },
   "dependencies": {
-    "@microsoft/sp-adaptive-card-extension-base": "1.14.0",
     "@microsoft/sp-core-library": "1.14.0",
+    "@microsoft/sp-lodash-subset": "1.14.0",
+    "@microsoft/sp-office-ui-fabric-core": "1.14.0",
     "@microsoft/sp-property-pane": "1.14.0",
-    "safedesk365-sdk": "0.0.10"
+    "@microsoft/sp-webpart-base": "1.14.0",
+    "@pnp/spfx-controls-react": "3.7.2",
+    "office-ui-fabric-react": "7.174.1",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "safedesk365-sdk": "0.0.11"
   },
   "devDependencies": {
+    "@types/react": "16.9.51",
+    "@types/react-dom": "16.9.8",
     "@microsoft/sp-build-web": "1.14.0",
     "@microsoft/sp-tslint-rules": "1.14.0",
     "@microsoft/sp-module-interfaces": "1.14.0",

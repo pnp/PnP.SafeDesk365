@@ -17,7 +17,6 @@ import { ISafeDesk365AceAdaptiveCardExtensionState } from './ISafeDesk365AceAdap
 
 import { SafeDesk365Client } from '../../services/safeDesk365Client/SafeDesk365Client';
 import { Booking } from 'safedesk365-sdk';
-import { AadHttpClient, HttpClientResponse } from '@microsoft/sp-http';
 
 export const CARD_VIEW_WELCOME_ID: string = 'SafeDesk365Ace_CV_WELCOME';
 export const CARD_VIEW_BOOKING_DONE_ID: string = 'SafeDesk365Ace_CV_BOOKING_DONE';
@@ -101,11 +100,11 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
         this.context.pageContext.user.email);
     }
 
-    // Get the whole list of locations
-    const locations = await this.properties.safeDesk365.getLocations();
-
-    // Get the whole list of bookings for the current user
-    const bookings = await this.properties.safeDesk365.getBookings();
+    // Get the whole list of locations and bookings
+    const [locations, bookings] = await Promise.all(
+      [this.properties.safeDesk365.getLocations(),
+      this.properties.safeDesk365.getBookings()]
+    );
 
     // Get today's bookings, if any
     const today: Date = new Date();
