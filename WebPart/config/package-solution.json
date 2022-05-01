@@ -3,7 +3,7 @@
   "solution": {
     "name": "pnp-safedesk-365-spfx-client-side-solution",
     "id": "3def0b4f-d85a-40d4-8c08-c84efc4f2875",
-    "version": "1.0.0.0",
+    "version": "1.0.0.1",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

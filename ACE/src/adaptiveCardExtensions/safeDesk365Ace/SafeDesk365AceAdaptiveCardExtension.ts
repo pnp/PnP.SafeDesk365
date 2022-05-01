@@ -100,11 +100,11 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
         this.context.pageContext.user.email);
     }
 
-    // Get the whole list of locations
-    const locations = await this.properties.safeDesk365.getLocations();
-
-    // Get the whole list of bookings for the current user
-    const bookings = await this.properties.safeDesk365.getBookings();
+    // Get the whole list of locations and bookings
+    const [locations, bookings] = await Promise.all(
+      [this.properties.safeDesk365.getLocations(),
+      this.properties.safeDesk365.getBookings()]
+    );
 
     // Get today's bookings, if any
     const today: Date = new Date();

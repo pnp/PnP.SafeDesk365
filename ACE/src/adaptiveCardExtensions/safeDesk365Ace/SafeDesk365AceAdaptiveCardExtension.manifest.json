@@ -17,7 +17,7 @@
   "preconfiguredEntries": [{
     "groupId": "bd067b1e-3ad5-4d5d-a5fe-505f07d7f59c", // Dashboard
     "group": { "default": "Dashboard" },
-    "title": { "default": "Safe Desk 365" },
+    "title": { "default": "Safe Desk 365 - ACE" },
     "description": { "default": "Safe Desk 365 Adaptive Card Extension" },
     "officeFabricIconFontName": "CityNext",
     "cardSize": "Large",

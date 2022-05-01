@@ -18,7 +18,7 @@
   "preconfiguredEntries": [{
     "groupId": "5c03119e-3074-46fd-976b-c60198311f70", // Other
     "group": { "default": "Other" },
-    "title": { "default": "Safe Desk 365" },
+    "title": { "default": "Safe Desk 365 - Web Part" },
     "description": { "default": "Safe Desk 365 web part to manage bookings" },
     "officeFabricIconFontName": "CityNext",
     "properties": {
