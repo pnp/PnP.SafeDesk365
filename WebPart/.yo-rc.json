@@ -1,0 +1,16 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.14.0",
+    "libraryName": "pnp-safedesk-365-spfx",
+    "libraryId": "3def0b4f-d85a-40d4-8c08-c84efc4f2875",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "pnp-safedesk-365-spfx",
+    "solutionShortDescription": "pnp-safedesk-365-spfx description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

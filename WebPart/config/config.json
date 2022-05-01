@@ -1,0 +1,19 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "safe-desk-365-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/safeDesk365/SafeDesk365WebPart.js",
+          "manifest": "./src/webparts/safeDesk365/SafeDesk365WebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "SafeDesk365WebPartStrings": "lib/webparts/safeDesk365/loc/{locale}.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js"
+  }
+}

@@ -17,7 +17,6 @@ import { ISafeDesk365AceAdaptiveCardExtensionState } from './ISafeDesk365AceAdap
 
 import { SafeDesk365Client } from '../../services/safeDesk365Client/SafeDesk365Client';
 import { Booking } from 'safedesk365-sdk';
-import { AadHttpClient, HttpClientResponse } from '@microsoft/sp-http';
 
 export const CARD_VIEW_WELCOME_ID: string = 'SafeDesk365Ace_CV_WELCOME';
 export const CARD_VIEW_BOOKING_DONE_ID: string = 'SafeDesk365Ace_CV_BOOKING_DONE';
