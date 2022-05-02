@@ -24,15 +24,16 @@ import { LURecognizer } from './luRecognizer';
 import { BookingDialog } from './bookingDialog';
 import { GetDesksDialog } from './getDesksDialog';
 import { BookingDetails } from './bookingDetails';
+import { LogoutDialog } from "./logoutDialog";
 
 const MAIN_DIALOG_ID = "mainDialog";
 const MAIN_WATERFALL_DIALOG_ID = "mainWaterfallDialog";
 
-export class MainDialog extends ComponentDialog {
+export class MainDialog extends LogoutDialog {
     private luisRecognizer: LURecognizer;
     public onboarding: boolean;
     constructor(luisRecognizer: LURecognizer) {
-        super(MAIN_DIALOG_ID);
+        super(MAIN_DIALOG_ID, process.env.SSO_CONNECTION_NAME as string);
 
         if (!luisRecognizer) throw new Error('[MainDialog]: Missing parameter \'luisRecognizer\' is required');
         this.luisRecognizer = luisRecognizer;

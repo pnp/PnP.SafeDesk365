@@ -11,11 +11,12 @@
   },
   "dependencies": {
     "@fluentui/react-northstar": "~0.58.0",
+    "@microsoft/microsoft-graph-client": "3.0.2",
     "@microsoft/recognizers-text-data-types-timex-expression": "1.1.4",
     "@microsoft/teams-js": "~1.11.0",
     "axios": "^0.21.1",
     "botbuilder": "4.14.1",
-    "botbuilder-ai": "^4.16.0",
+    "botbuilder-ai": "4.16.0",
     "botbuilder-dialogs": "4.14.1",
     "compression": "1.7.4",
     "debug": "4.3.2",
@@ -23,6 +24,8 @@
     "express": "4.16.4",
     "express-msteams-host": "1.9.0",
     "express-session": "1.15.6",
+    "isomorphic-fetch": "3.0.0",
+    "jwt-decode": "3.1.2",
     "morgan": "1.9.1",
     "msteams-react-base-component": "^3.1.1",
     "react": "^16.8.6",
@@ -30,6 +33,7 @@
     "safedesk365-sdk": "^0.0.10"
   },
   "devDependencies": {
+    "@microsoft/microsoft-graph-types": "2.19.0",
     "@types/debug": "4.1.7",
     "@types/express": "4.16.0",
     "@types/express-session": "1.15.10",

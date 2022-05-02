@@ -26,7 +26,7 @@ export class LURecognizer {
      * @param {TurnContext} context
      */
     public async executeLuisQuery(context: TurnContext): Promise<RecognizerResult> {
-        return this.recognizer.recognize(context);
+        return await this.recognizer.recognize(context);
     }
 
     public getBookingSlotEntities(result) {
