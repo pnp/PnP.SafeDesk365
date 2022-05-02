@@ -7,7 +7,7 @@ import { BookingCheckedOutView } from './cardView/BookingCheckedOutView';
 import { BookSelectionQuickView } from './quickView/BookSelectionQuickView';
 import { BookFreeQuickView } from './quickView/BookFreeQuickView';
 import { BookSpecificQuickView } from './quickView/BookSpecificQuickView';
-import { BookingDoneQuickView } from './quickView/BookingDoneQuickView';
+import { BookingNoSpotsQuickView } from './quickView/BookingNoSpotsQuickView';
 import { CheckInQuickView } from './quickView/CheckInQuickView';
 import { CheckOutQuickView } from './quickView/CheckOutQuickView';
 import { SafeDesk365AcePropertyPane } from './SafeDesk365AcePropertyPane';
@@ -25,7 +25,7 @@ export const QUICK_VIEW_CHECKOUT_ID: string = 'SafeDesk365Ace_QV_CHECKOUT';
 export const QUICK_VIEW_BOOK_SELECTION_ID: string = 'SafeDesk365Ace_QV_BOOK_SELECTION';
 export const QUICK_VIEW_BOOK_FREE_ID: string = 'SafeDesk365Ace_QV_BOOK_FREE';
 export const QUICK_VIEW_BOOK_SPECIFIC_ID: string = 'SafeDesk365Ace_QV_BOOK_SPECIFIC';
-export const QUICK_VIEW_BOOK_DONE_ID: string = 'SafeDesk365Ace_QV_BOOK_DONE';
+export const QUICK_VIEW_BOOK_NO_SPOTS_ID: string = 'SafeDesk365Ace_QV_BOOK_NO_SPOTS';
 export const CARD_VIEW_BOOKING_CHECKEDIN_ID: string = 'SafeDesk365Ace_CV_BOOK_CHECKEIN';
 export const CARD_VIEW_BOOKING_CHECKEDOUT_ID: string = 'SafeDesk365Ace_CV_BOOK_CHECKEOUT';
 
@@ -39,7 +39,10 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
     this.state = {
       loading: true,
       locations: undefined,
-      desks: undefined
+      desks: undefined,
+      // Save the fetchData function in the properties
+      // to make it available to the cards
+      fetchData: this.fetchData
     };
 
     // Register all the card and quick views
@@ -52,11 +55,7 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
     this.quickViewNavigator.register(QUICK_VIEW_BOOK_SELECTION_ID, () => new BookSelectionQuickView());
     this.quickViewNavigator.register(QUICK_VIEW_BOOK_FREE_ID, () => new BookFreeQuickView());
     this.quickViewNavigator.register(QUICK_VIEW_BOOK_SPECIFIC_ID, () => new BookSpecificQuickView());
-    this.quickViewNavigator.register(QUICK_VIEW_BOOK_DONE_ID, () => new BookingDoneQuickView());
-
-    // Save the fetchData function in the properties
-    // to make it available to the cards
-    this.properties.fetchData = this.fetchData;
+    this.quickViewNavigator.register(QUICK_VIEW_BOOK_NO_SPOTS_ID, () => new BookingNoSpotsQuickView());
 
     // Fetch data asynchronously
     setTimeout(this.fetchData, 200);
@@ -87,23 +86,27 @@ export default class SafeDesk365AceAdaptiveCardExtension extends BaseAdaptiveCar
   private fetchData = async () => {
 
     // Initialize the SafeDesk365 Client if it is not yet initialized
-    if (!this.properties.safeDesk365) {
+    if (!this.state.safeDesk365) {
 
       // Initialize the AAD OAuth Token Provider, first
       const tokenProvider = await this.context.aadTokenProviderFactory.getTokenProvider();
       const accessToken: string = await tokenProvider.getToken(this.properties.safeDesk365ApiId);
 
       // Then create a new instance of the SafeDesk365 Client
-      this.properties.safeDesk365 = new SafeDesk365Client(
+      const safeDesk365Client: SafeDesk365Client = new SafeDesk365Client(
         this.properties.safeDesk365ApiUri, 
         accessToken, 
         this.context.pageContext.user.email);
+
+        this.setState({
+          safeDesk365: safeDesk365Client
+        });
     }
 
     // Get the whole list of locations and bookings
     const [locations, bookings] = await Promise.all(
-      [this.properties.safeDesk365.getLocations(),
-      this.properties.safeDesk365.getBookings()]
+      [this.state.safeDesk365.getLocations(),
+      this.state.safeDesk365.getBookings()]
     );
 
     // Get today's bookings, if any

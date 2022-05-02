@@ -30,7 +30,7 @@ export class SafeDesk365Client implements ISafeDesk365Client {
      * Deletes a booking
      * @returns No result
      */
-    public async deleteBooking(bookingId: number): Promise<boolean> {
+    public async removeBooking(bookingId: number): Promise<boolean> {
       return this._client.RemoveBooking(bookingId);
     }
 }

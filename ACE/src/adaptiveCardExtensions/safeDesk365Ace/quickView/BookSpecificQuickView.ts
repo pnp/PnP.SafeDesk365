@@ -32,7 +32,7 @@ export class BookSpecificQuickView extends BaseAdaptiveCardView<
       const deskCode: string = action.data.specificDesk;
 
       // Here we create the booking, upon confirmation from the user
-      const bookingId: number = await this.properties.safeDesk365.bookDesk(
+      const bookingId: number = await this.state.safeDesk365.bookDesk(
         this.context.pageContext.user.email,
         this.state.bookingLocation, 
         deskCode, 

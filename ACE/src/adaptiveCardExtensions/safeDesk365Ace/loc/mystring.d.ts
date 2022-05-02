@@ -39,6 +39,7 @@ declare interface ISafeDesk365AceAdaptiveCardExtensionStrings {
   ChooseDesk: string;
   ChooseDeskPlaceholder: string;
   ChooseDeskRequired: string;
+  BookingNoSpots: string;
 
   // Check-in / Check-out
   CheckInTitle: string;

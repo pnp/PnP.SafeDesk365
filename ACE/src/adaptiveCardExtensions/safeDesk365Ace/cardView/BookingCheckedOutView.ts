@@ -50,7 +50,7 @@ export class BookingCheckedOutView extends BaseImageCardView<ISafeDesk365AceAdap
       });
 
       // Refresh data
-      await this.properties.fetchData();
+      await this.state.fetchData();
 
       this.cardNavigator.replace(CARD_VIEW_WELCOME_ID);
     }

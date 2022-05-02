@@ -20,12 +20,14 @@ export default class SafeDesk365 extends React.Component<ISafeDesk365Props, ISaf
       displayName: "ID",
       sorting: false,
       minWidth: 50,
+      maxWidth: 50
     },
     {
       name: "deskCode",
       displayName: "Desk Code",
       sorting: true,
       minWidth: 100,
+      maxWidth: 150
     },
     {
       name: "date",
@@ -37,18 +39,20 @@ export default class SafeDesk365 extends React.Component<ISafeDesk365Props, ISaf
       },
       sorting: true,
       minWidth: 100,
+      maxWidth: 150
     },
     {
       name: "timeSlot",
       displayName: "Time Slot",
       sorting: false,
       minWidth: 100,
+      maxWidth: 100,
     },
     {
       name: "location",
       displayName: "Location",
       sorting: true,
-      minWidth: 150,
+      minWidth: 150
     },
     {
       name: "action",
@@ -62,6 +66,7 @@ export default class SafeDesk365 extends React.Component<ISafeDesk365Props, ISaf
           }} />;  
       },
       minWidth: 50,
+      maxWidth: 50
     }
   ];
   
@@ -93,7 +98,7 @@ export default class SafeDesk365 extends React.Component<ISafeDesk365Props, ISaf
   }
 
   private _removeBooking = async (bookingId: number) => {
-    await this.props.safeDesk365Client.deleteBooking(bookingId);
+    await this.props.safeDesk365Client.removeBooking(bookingId);
   }
 
   public componentDidMount(): void {
