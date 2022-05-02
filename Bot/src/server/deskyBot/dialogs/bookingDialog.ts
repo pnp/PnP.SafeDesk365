@@ -1,5 +1,5 @@
 import { TimexProperty } from '@microsoft/recognizers-text-data-types-timex-expression';
-import { InputHints, MessageFactory } from 'botbuilder';
+import { InputHints, MessageFactory, tokenResponseEventName } from 'botbuilder';
 import {
     ComponentDialog,
     ConfirmPrompt,
@@ -10,17 +10,29 @@ import {
 } from 'botbuilder-dialogs';
 import { BookingDetails } from './bookingDetails';
 import { DateResolverDialog } from './dateResolverDialog';
+import { LogoutDialog } from "./logoutDialog";
+import { SsoOauthPrompt } from "./ssoOauthPrompt";
+import "isomorphic-fetch";
+import { SafeDesk365, Location, DeskAvailability, Booking } from "../helpers/safeDesk365";
 
 const CONFIRM_PROMPT = 'confirmPrompt';
 const DATE_RESOLVER_DIALOG = 'dateResolverDialog';
 const TEXT_PROMPT = 'textPrompt';
 const WATERFALL_DIALOG = 'waterfallDialog';
 const BOOKING_DIALOG_ID = "bookingDialog";
+const OAUTH_PROMPT_ID = "OAuthPrompt";
 
-export class BookingDialog extends ComponentDialog {
+export class BookingDialog extends LogoutDialog  {
     constructor() {
-        super(BOOKING_DIALOG_ID);
+        super(BOOKING_DIALOG_ID, process.env.SSO_CONNECTION_NAME as string);
 
+        // sso signin prompt
+        this.addDialog(new SsoOauthPrompt(OAUTH_PROMPT_ID, {
+            connectionName: process.env.SSO_CONNECTION_NAME as string,
+            text: "Please sign in",
+            title: "Sign In",
+            timeout: 300000
+        }));
         this.addDialog(new TextPrompt(TEXT_PROMPT))
             .addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
             .addDialog(new DateResolverDialog(DATE_RESOLVER_DIALOG))
@@ -29,6 +41,8 @@ export class BookingDialog extends ComponentDialog {
                 this.deskCodeStep.bind(this),
                 this.bookingDateStep.bind(this),
                 this.confirmStep.bind(this),
+                this.choiceStep.bind(this),
+                this.promptStep.bind(this),
                 this.finalStep.bind(this)
             ]));
 
@@ -48,6 +62,7 @@ export class BookingDialog extends ComponentDialog {
         } else {
             return await stepContext.next(bookingDetails.bookingSlot);
         }
+;
     }
 
     /**
@@ -88,39 +103,56 @@ export class BookingDialog extends ComponentDialog {
      */
     private async confirmStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
         const bookingDetails = stepContext.options as BookingDetails;
-
         // Capture the results of the previous step
         bookingDetails.dateTime = stepContext.result;
         const messageText = `Please confirm your booking. <br/> Booking slot: ${ bookingDetails.bookingSlot } <br/> Desk code: ${ bookingDetails.deskCode } <br/> Date: ${ bookingDetails.dateTime }. <br/> Is this correct?`;
         const msg = MessageFactory.text(messageText, messageText, InputHints.ExpectingInput);
-
         // Offer a YES/NO prompt.
         return await stepContext.prompt(CONFIRM_PROMPT, { prompt: msg });
     }
+    
 
     /**
      * Complete the interaction and end the dialog.
      */
-    private async finalStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
+    private async choiceStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
+        console.log(stepContext.result);
         if (stepContext.result === true) {
-            const bookingDetails = stepContext.options as BookingDetails;
-
-            /*
-            Connect to API here
-            */
-
-            await stepContext.context.sendActivity("Great, your booking has been successful! Have fun in the office 👍");
-
-            return await stepContext.endDialog(bookingDetails);
+            return await stepContext.next();
         }
         else {
             await stepContext.context.sendActivity("Ok then let's go through the details step by step...");
-
             const bookingDetails = new BookingDetails;
             return await stepContext.beginDialog('bookingDialog', bookingDetails);
         }
-        //return await stepContext.endDialog();
     }
+
+    public async promptStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
+        try {
+          return await stepContext.beginDialog(OAUTH_PROMPT_ID);
+        } catch (err) {
+          console.error(err);
+        }
+        return await stepContext.endDialog();
+    }
+
+    private async finalStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
+        // get token from prev step (or directly from the prompt itself)
+        const tokenResponse = stepContext.result;
+        //await stepContext.context.sendActivity(tokenResponse.token);
+        const bookingDetails = stepContext.options as BookingDetails;
+        console.log(bookingDetails.deskLocation);
+        // connect to API
+
+        var c = new SafeDesk365("https://safedesk365-pro.azurewebsites.net/", tokenResponse.token);
+        var desks = c.GetUpcomingdeskAvailabilities();
+        console.log(desks);
+        var availability = c.GetUpcomingdeskAvailabilities(bookingDetails.dateTime, bookingDetails.deskLocation);
+        console.log(availability);
+        
+        return await stepContext.endDialog(bookingDetails);
+    }
+
 
     private isAmbiguous(timex: string): boolean {
         const timexPropery = new TimexProperty(timex);

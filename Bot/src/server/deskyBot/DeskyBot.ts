@@ -35,6 +35,7 @@ export class DeskyBot extends DialogBot {
         luisRecognizer = new LURecognizer(luisConfig);
 
         super(conversationState, userState, new MainDialog(luisRecognizer));
+        //super(conversationState, userState, new MainDialog());
         this._ssoOAuthHelper = new SsoOAuthHelper();
 
         this.onMembersAdded(async (context, next) => {

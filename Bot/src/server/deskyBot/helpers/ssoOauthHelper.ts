@@ -11,6 +11,7 @@ import {
 export class SsoOAuthHelper {
 
   public async shouldProcessTokenExchange(turnContext: TurnContext): Promise<boolean> {
+    console.log("Trying to authenticate - ssoOauthhelper");
     if (turnContext.activity.name !== tokenExchangeOperationName) {
       throw new Error(`Only '${tokenExchangeOperationName}' invoke activities can be processed by TokenExchangeHelper.`);
     }

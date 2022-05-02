@@ -30,7 +30,7 @@
     "msteams-react-base-component": "^3.1.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "safedesk365-sdk": "^0.0.10"
+    "safedesk365-sdk": "^0.0.11"
   },
   "devDependencies": {
     "@microsoft/microsoft-graph-types": "2.19.0",

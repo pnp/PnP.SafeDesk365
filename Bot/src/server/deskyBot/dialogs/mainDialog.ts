@@ -1,65 +1,66 @@
 import {
-    ComponentDialog,
+    InputHints,
+    MessageFactory,
+    StatePropertyAccessor,
+    TurnContext
+} from "botbuilder-core";
+import {
     DialogSet,
     DialogState,
     DialogTurnResult,
     DialogTurnStatus,
-    TextPrompt,
     WaterfallDialog,
     WaterfallStepContext
 } from "botbuilder-dialogs";
-import {
-    MessageFactory,
-    StatePropertyAccessor,
-    InputHints,
-    TurnContext,
-    RecognizerResult
-} from "botbuilder";
-import { TeamsInfoDialog } from "./teamsInfoDialog";
-import { HelpDialog } from "./helpDialog";
-import { MentionUserDialog } from "./mentionUserDialog";
-//Custom imports
 import { LuisRecognizer } from 'botbuilder-ai';
+import { LogoutDialog } from "./logoutDialog";
+import { SsoOauthPrompt } from "./ssoOauthPrompt";
+import "isomorphic-fetch";
+import { MsGraphHelper } from "../helpers/msGraphHelper";
 import { LURecognizer } from './luRecognizer';
 import { BookingDialog } from './bookingDialog';
 import { GetDesksDialog } from './getDesksDialog';
 import { BookingDetails } from './bookingDetails';
-import { LogoutDialog } from "./logoutDialog";
-
-const MAIN_DIALOG_ID = "mainDialog";
-const MAIN_WATERFALL_DIALOG_ID = "mainWaterfallDialog";
-
+const MAIN_DIALOG_ID = "MainDialog";
+const MAIN_WATERFALL_DIALOG_ID = "MainWaterfallDialog";
+const OAUTH_PROMPT_ID = "OAuthPrompt";
 export class MainDialog extends LogoutDialog {
     private luisRecognizer: LURecognizer;
     public onboarding: boolean;
     constructor(luisRecognizer: LURecognizer) {
         super(MAIN_DIALOG_ID, process.env.SSO_CONNECTION_NAME as string);
-
         if (!luisRecognizer) throw new Error('[MainDialog]: Missing parameter \'luisRecognizer\' is required');
         this.luisRecognizer = luisRecognizer;
+        // sso signin prompt
+        this.addDialog(new SsoOauthPrompt(OAUTH_PROMPT_ID, {
+            connectionName: process.env.SSO_CONNECTION_NAME as string,
+            text: "Please sign in",
+            title: "Sign In",
+            timeout: 300000
+        }));
 
-        this.addDialog(new TextPrompt("TextPrompt"))
-            .addDialog(new TeamsInfoDialog())
-            .addDialog(new HelpDialog())
-            .addDialog(new MentionUserDialog())
-            .addDialog(new BookingDialog())
-            .addDialog(new GetDesksDialog())
-            .addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG_ID, [
-                this.introStep.bind(this),
-                this.actStep.bind(this),
-                this.finalStep.bind(this)
-            ]));
+        this.addDialog(new BookingDialog());
+        this.addDialog(new GetDesksDialog());
+
+        // add waterfall dialogs
+        this.addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG_ID, [
+            this.introStep.bind(this),
+            this.promptStep.bind(this),
+            this.displayMicrosoftGraphDataStep.bind(this)
+        ]));
+
+        // set the initial dialog to the waterfall
         this.initialDialogId = MAIN_WATERFALL_DIALOG_ID;
         this.onboarding = false;
     }
 
-    public async run(context: TurnContext, accessor: StatePropertyAccessor<DialogState>) {
+    public async run(turnContext: TurnContext, accessor: StatePropertyAccessor<DialogState>): Promise<void> {
         const dialogSet = new DialogSet(accessor);
         dialogSet.add(this);
-        const dialogContext = await dialogSet.createContext(context);
+        const dialogContext = await dialogSet.createContext(turnContext);
         const results = await dialogContext.continueDialog();
         if (results.status === DialogTurnStatus.empty) {
-            await dialogContext.beginDialog(this.id);
+        await dialogContext.beginDialog(this.id);
         }
     }
 
@@ -74,9 +75,29 @@ export class MainDialog extends LogoutDialog {
         }
     }
 
-    private async actStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
-        if (stepContext.result) {
-            // Get the intent + entities from LUIS
+    public async promptStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
+        try {
+        return await stepContext.beginDialog(OAUTH_PROMPT_ID);
+        } catch (err) {
+        console.error(err);
+        }
+        return await stepContext.endDialog();
+    }
+
+    public async displayMicrosoftGraphDataStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
+        // get token from prev step (or directly from the prompt itself)
+        const tokenResponse = stepContext.result;
+        if (!tokenResponse?.token) {
+            await stepContext.context.sendActivity("Login not successful, please try again.");
+        } else {
+            const msGraphClient = new MsGraphHelper(tokenResponse?.token);
+
+            const user = await msGraphClient.getCurrentUser();
+            //await stepContext.context.sendActivity(`Thank you for signing in ${user.displayName as string} (${user.userPrincipalName as string})!`);
+            //await stepContext.context.sendActivity("I can retrieve your details from Microsoft Graph using my support for SSO! For example...");
+            //await stepContext.context.sendActivity(`Your token "${tokenResponse.token as string}"`);
+
+
             const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
             const intent = LuisRecognizer.topIntent(luisResult)
             const entities = luisResult.entities;
@@ -91,12 +112,6 @@ export class MainDialog extends LogoutDialog {
             bookingDetails.dateTime = dateTimeEntities;
             bookingDetails.deskCode = deskCodeEntities;
             bookingDetails.deskLocation = deskLocationEntities;
-
-            console.log(entities.$instance.BookingSlot);
-            console.log(bookingSlot);
-            console.log(dateTimeEntities);
-            console.log(deskCodeEntities);
-            console.log(deskLocationEntities);
             switch(intent){
                 case "BookDesk":{
                     // Open BookingDialog
@@ -113,27 +128,8 @@ export class MainDialog extends LogoutDialog {
                     return await stepContext.next();
                 }  
             }
-        } else if (this.onboarding) {
-            switch (stepContext.context.activity.text) {
-                case "who": {
-                    return await stepContext.beginDialog("teamsInfoDialog");
-                }
-                case "help": {
-                    return await stepContext.beginDialog("helpDialog");
-                }
-                case "mention": {
-                    return await stepContext.beginDialog("mentionUserDialog");
-                }
-                default: {
-                    await stepContext.context.sendActivity("Ok, maybe next time 😉");
-                    return await stepContext.next();
-                }
-            }
         }
-        return await stepContext.next();
-    }
 
-    private async finalStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
-        return await stepContext.replaceDialog(this.initialDialogId, { restartMsg: "What else can I do for you?" });
+        return await stepContext.endDialog();
     }
 }
