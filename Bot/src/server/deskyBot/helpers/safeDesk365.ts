@@ -7,7 +7,9 @@
 /* tslint:disable */
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
-
+//
+// https://bobbyhadz.com/blog/typescript-http-request
+//
 export class SafeDesk365 {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -15,7 +17,7 @@ export class SafeDesk365 {
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
     constructor(baseUrl?: string, bearerToken?:string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
-        this.http = http ? http : http as any;
+        this.http = http ? http : window as any;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "https://safedesk365-pro.azurewebsites.net";
         this.bearerToken = bearerToken !== undefined && bearerToken !== null ? bearerToken : ""
     }

@@ -14,6 +14,7 @@ import { LogoutDialog } from "./logoutDialog";
 import { SsoOauthPrompt } from "./ssoOauthPrompt";
 import "isomorphic-fetch";
 import { SafeDesk365, Location, DeskAvailability, Booking } from "../helpers/safeDesk365";
+import { HttpRequestUtils } from 'botbuilder-ai/lib/qnamaker-utils';
 
 const CONFIRM_PROMPT = 'confirmPrompt';
 const DATE_RESOLVER_DIALOG = 'dateResolverDialog';
@@ -144,7 +145,8 @@ export class BookingDialog extends LogoutDialog  {
         console.log(bookingDetails.deskLocation);
         // connect to API
 
-        var c = new SafeDesk365("https://safedesk365-pro.azurewebsites.net/", tokenResponse.token);
+        var http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> } = new fetch(url: RequestInfo, init?: RequestInit);
+        var c = new SafeDesk365("https://safedesk365-pro.azurewebsites.net/", tokenResponse.token, http);
         var desks = c.GetUpcomingdeskAvailabilities();
         console.log(desks);
         var availability = c.GetUpcomingdeskAvailabilities(bookingDetails.dateTime, bookingDetails.deskLocation);

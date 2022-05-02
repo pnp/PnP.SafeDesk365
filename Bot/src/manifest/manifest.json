@@ -15,8 +15,8 @@
     "full": "Desky"
   },
   "description": {
-    "short": "TODO: add short description here",
-    "full": "TODO: add full description here"
+    "short": "Your personal Safe Desk 365 chatbot",
+    "full": "Desky is here to assist you checking desk availabilities and booking desks with ease"
   },
   "icons": {
     "outline": "icon-outline.png",

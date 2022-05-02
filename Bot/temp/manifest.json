@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.11/MicrosoftTeams.schema.json",
   "manifestVersion": "1.11",
   "id": "533471d0-b669-11ec-8b51-adf901e6d2b7",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "packageName": "desky",
   "developer": {
     "name": "PnP",
@@ -15,8 +15,8 @@
     "full": "Desky"
   },
   "description": {
-    "short": "TODO: add short description here",
-    "full": "TODO: add full description here"
+    "short": "Your personal Safe Desk 365 chatbot",
+    "full": "Desky is here to assist you checking desk availabilities and booking desks with ease"
   },
   "icons": {
     "outline": "icon-outline.png",
