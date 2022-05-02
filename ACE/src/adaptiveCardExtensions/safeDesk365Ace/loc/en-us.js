@@ -33,6 +33,7 @@ define([], function() {
     "ChooseDesk": "Choose your desk:",
     "ChooseDeskPlaceholder": "Select desk",
     "ChooseDeskRequired": "Desk is required",
+    "BookingNoSpots": "There are no available desks for the requested location, date, and time slot!",
     "CheckInButton": "Check-in",
     "CheckOutButton": "Check-out",
     "BookTitle": "Book a Desk",

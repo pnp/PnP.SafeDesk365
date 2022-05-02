@@ -41,7 +41,7 @@ export class BookingDoneCardView extends BaseImageCardView<ISafeDesk365AceAdapti
   public async onAction(action: IActionArguments | any): Promise<void> {
     if (action.id == "refresh") {
       // Refresh data
-      await this.properties.fetchData();
+      await this.state.fetchData();
 
       this.setState({
         bookingDate: undefined,

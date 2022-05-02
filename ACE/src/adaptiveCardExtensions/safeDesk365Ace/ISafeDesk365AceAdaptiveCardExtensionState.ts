@@ -1,5 +1,6 @@
 import { Location, Booking, DeskAvailability } from 'safedesk365-sdk';
 import { TimeSlot } from '../../services/safeDesk365Client/TimeSlot';
+import { SafeDesk365Client } from '../../services/safeDesk365Client/SafeDesk365Client';
 
 export interface ISafeDesk365AceAdaptiveCardExtensionState {
     loading: boolean;
@@ -12,4 +13,6 @@ export interface ISafeDesk365AceAdaptiveCardExtensionState {
     bookingTimeSlot?: TimeSlot;
     deskAvailability?: DeskAvailability;
     bookingId?: number;
+    safeDesk365?: SafeDesk365Client;
+    fetchData?: () => Promise<void>;
 }

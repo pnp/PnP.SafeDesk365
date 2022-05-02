@@ -32,7 +32,7 @@ export class CheckOutQuickView extends BaseAdaptiveCardView<
       const bookingId: number = action.data.bookingId;
 
       // Here we check-out the booking
-      const booking: Booking = await this.properties.safeDesk365.checkOut(bookingId);
+      const booking: Booking = await this.state.safeDesk365.checkOut(bookingId);
 
       this.quickViewNavigator.close();
       this.cardNavigator.replace(CARD_VIEW_BOOKING_CHECKEDOUT_ID);

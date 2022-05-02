@@ -4,25 +4,23 @@ import { ISafeDesk365AceAdaptiveCardExtensionProps } from '../ISafeDesk365AceAda
 import { ISafeDesk365AceAdaptiveCardExtensionState } from '../ISafeDesk365AceAdaptiveCardExtensionState';
 import { CARD_VIEW_WELCOME_ID } from '../SafeDesk365AceAdaptiveCardExtension';
 
-export interface IBookingDoneQuickViewData {
-  bookingId: number;
+export interface IBookingNoSpotsQuickViewData {
   strings: ISafeDesk365AceAdaptiveCardExtensionStrings;
 }
 
-export class BookingDoneQuickView extends BaseAdaptiveCardView<
+export class BookingNoSpotsQuickView extends BaseAdaptiveCardView<
   ISafeDesk365AceAdaptiveCardExtensionProps,
   ISafeDesk365AceAdaptiveCardExtensionState,
-  IBookingDoneQuickViewData
+  IBookingNoSpotsQuickViewData
 > {
-  public get data(): IBookingDoneQuickViewData {
+  public get data(): IBookingNoSpotsQuickViewData {
     return {
-      bookingId: this.state.bookingId,
       strings: strings
     };
   }
 
   public get template(): ISPFxAdaptiveCard {
-    return require('./template/BookingDoneTemplate.json');
+    return require('./template/BookingNoSpotsTemplate.json');
   }
 
   public async onAction(action: IActionArguments | any): Promise<void> {

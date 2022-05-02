@@ -24,5 +24,5 @@ export interface ISafeDesk365Client {
      * Deletes a booking
      * @returns Whether the booking was removed or not
      */
-    deleteBooking: (bookingId: number) => Promise<boolean>;
+    removeBooking: (bookingId: number) => Promise<boolean>;
 }
