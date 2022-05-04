@@ -70,13 +70,13 @@
                   "actions": [
                       {
                           "type": "Action.OpenUrl",
-                          "title": "View Dashboard",
-                          "url": "https://aka.ms/yoteams"
+                          "title": "Check-In",
+                          "url": "https://zxqg4.sharepoint.com/SitePages/Dashboard.aspx"
                       },
                       {
                           "type": "Action.OpenUrl",
-                          "title": "View my bookings",
-                          "url": "https://aka.ms/yoteams"
+                          "title": "Manage bookings",
+                          "url": "https://zxqg4.sharepoint.com/SitePages/Manage-Bookings.aspx"
                       }
                   ],
                   "height": "stretch",
@@ -86,17 +86,6 @@
               {
                   "type": "ActionSet",
                   "actions": [
-                      {
-                          "type": "Action.Submit",
-                          "title": "Book a desk",
-                          "data": {
-                              "msteams": {
-                                  "type": "messageBack",
-                                  "displayText": "who am i?",
-                                  "text": "who"
-                              }
-                          }
-                      },
                       {
                           "type": "Action.Submit",
                           "title": "Get help",

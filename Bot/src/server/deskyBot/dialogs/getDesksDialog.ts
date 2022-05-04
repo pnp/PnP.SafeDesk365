@@ -1,25 +1,29 @@
 import { TimexProperty } from '@microsoft/recognizers-text-data-types-timex-expression';
-import { InputHints, MessageFactory } from 'botbuilder';
+import { CardFactory, InputHints, MessageFactory, TurnContext  } from 'botbuilder';
 import {
     ComponentDialog,
     ConfirmPrompt,
     DialogTurnResult,
+    OAuthPrompt,
     TextPrompt,
     WaterfallDialog,
     WaterfallStepContext
 } from 'botbuilder-dialogs';
+import { token } from 'morgan';
 import { BookingDetails } from './bookingDetails';
 import { DateResolverDialog } from './dateResolverDialog';
+import { LogoutDialog } from './logoutDialog';
 
 const CONFIRM_PROMPT = 'confirmPrompt';
 const DATE_RESOLVER_DIALOG = 'dateResolverDialog';
 const TEXT_PROMPT = 'textPrompt';
 const WATERFALL_DIALOG = 'waterfallDialog';
 const GETDESKS_DIALOG_ID = "getDesksDialog";
+const OAUTH_PROMPT = 'OAuthPrompt';
 
-export class GetDesksDialog extends ComponentDialog {
+export class GetDesksDialog extends LogoutDialog {
     constructor() {
-        super(GETDESKS_DIALOG_ID);
+        super(GETDESKS_DIALOG_ID, process.env.SSO_CONNECTION_NAME as string);
 
         this.addDialog(new TextPrompt(TEXT_PROMPT))
             .addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
@@ -29,9 +33,15 @@ export class GetDesksDialog extends ComponentDialog {
                 this.deskCodeStep.bind(this),
                 this.bookingDateStep.bind(this),
                 this.confirmStep.bind(this),
-                this.finalStep.bind(this)
+                this.finalStep.bind(this),
+                this.authStep.bind(this)
             ]));
-
+            this.addDialog(new OAuthPrompt(OAUTH_PROMPT, {
+                connectionName: process.env.connectionName as string,
+                text: 'Please sign in to continue',
+                timeout: 300000,
+                title: 'Sign in please'
+            }));
         this.initialDialogId = WATERFALL_DIALOG;
     }
 
@@ -108,10 +118,12 @@ export class GetDesksDialog extends ComponentDialog {
             /*
             Connect to API here
             */
-
+            
             await stepContext.context.sendActivity("Here go the desk availability details 👍");
 
-            return await stepContext.endDialog(bookingDetails);
+            //return await stepContext.endDialog(bookingDetails);
+
+            return await stepContext.next();
         }
         else {
             await stepContext.context.sendActivity("Ok then let's go through the details step by step...");
@@ -122,8 +134,34 @@ export class GetDesksDialog extends ComponentDialog {
         //return await stepContext.endDialog();
     }
 
+    private async authStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
+
+        await stepContext.context.sendActivity({ attachments: [this.createOAuthCard()] });
+        return await stepContext.endDialog();
+    }
+
+    private async tokenStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
+        const tokenResponse = stepContext.result;
+        if (tokenResponse) {
+            await stepContext.context.sendActivity('You are now logged in.');
+            console.log(tokenResponse);
+            return await stepContext.endDialog();
+        }
+        await stepContext.context.sendActivity('Login was not successful please try again.');
+        return await stepContext.endDialog();  
+    }
+
+
     private isAmbiguous(timex: string): boolean {
         const timexPropery = new TimexProperty(timex);
         return !timexPropery.types.has('definite');
+    }
+
+    private createOAuthCard() {
+        return CardFactory.oauthCard(
+            'safedesk', // Replace with the name of your Azure AD connection
+            'Sign in to SafeDesk 365',
+            'SafeDesk365 OAuth Card'
+        );
     }
 }

@@ -38,7 +38,7 @@ export class HelpDialog extends ComponentDialog {
     }
 
     private async introStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
-        const message = MessageFactory.text("I am terribly sorry, but my developer hasn't trained me to do anything yet 😂. Please refer to [this link](https://docs.microsoft.com/en-us/microsoftteams/platform/bots/what-are-bots) to see how to develop bots for Teams");
+        const message = MessageFactory.text("I can help you book a desk for your next office visit. Simply type in something like *'I want to book a desk on 5/5/2022 in the morning in Seattle'* and I'll manage the rest for you 👍");
         await stepContext.context.sendActivity(message);
         return await stepContext.endDialog();
     }

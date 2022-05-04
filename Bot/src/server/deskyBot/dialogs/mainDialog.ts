@@ -16,9 +16,9 @@ import { LuisRecognizer } from 'botbuilder-ai';
 import { LogoutDialog } from "./logoutDialog";
 import { SsoOauthPrompt } from "./ssoOauthPrompt";
 import "isomorphic-fetch";
-import { MsGraphHelper } from "../helpers/msGraphHelper";
 import { LURecognizer } from './luRecognizer';
 import { BookingDialog } from './bookingDialog';
+import { HelpDialog } from './helpDialog';
 import { GetDesksDialog } from './getDesksDialog';
 import { BookingDetails } from './bookingDetails';
 const MAIN_DIALOG_ID = "MainDialog";
@@ -41,12 +41,14 @@ export class MainDialog extends LogoutDialog {
 
         this.addDialog(new BookingDialog());
         this.addDialog(new GetDesksDialog());
+        this.addDialog(new HelpDialog());
 
         // add waterfall dialogs
         this.addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG_ID, [
             this.introStep.bind(this),
-            this.promptStep.bind(this),
-            this.displayMicrosoftGraphDataStep.bind(this)
+            //this.promptStep.bind(this),
+            //his.displayMicrosoftGraphDataStep.bind(this)
+            this.luisStep.bind(this)
         ]));
 
         // set the initial dialog to the waterfall
@@ -75,61 +77,40 @@ export class MainDialog extends LogoutDialog {
         }
     }
 
-    public async promptStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
-        try {
-        return await stepContext.beginDialog(OAUTH_PROMPT_ID);
-        } catch (err) {
-        console.error(err);
-        }
-        return await stepContext.endDialog();
-    }
-
-    public async displayMicrosoftGraphDataStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
-        // get token from prev step (or directly from the prompt itself)
-        const tokenResponse = stepContext.result;
-        if (!tokenResponse?.token) {
-            await stepContext.context.sendActivity("Login not successful, please try again.");
-        } else {
-            const msGraphClient = new MsGraphHelper(tokenResponse?.token);
-
-            const user = await msGraphClient.getCurrentUser();
-            //await stepContext.context.sendActivity(`Thank you for signing in ${user.displayName as string} (${user.userPrincipalName as string})!`);
-            //await stepContext.context.sendActivity("I can retrieve your details from Microsoft Graph using my support for SSO! For example...");
-            //await stepContext.context.sendActivity(`Your token "${tokenResponse.token as string}"`);
-
-
-            const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
-            const intent = LuisRecognizer.topIntent(luisResult)
-            const entities = luisResult.entities;
-            // Get the text values for all needed entities
-            const bookingSlot = this.luisRecognizer.getBookingSlotEntities(luisResult);
-            const dateTimeEntities = this.luisRecognizer.getDateTimeEntities(luisResult);
-            const deskCodeEntities = this.luisRecognizer.getDeskCodeEntities(luisResult);
-            const deskLocationEntities = this.luisRecognizer.getDeskLocationEntities(luisResult);
-            // Populate the bookingDetails
-            const bookingDetails = new BookingDetails();
-            bookingDetails.bookingSlot = bookingSlot;
-            bookingDetails.dateTime = dateTimeEntities;
-            bookingDetails.deskCode = deskCodeEntities;
-            bookingDetails.deskLocation = deskLocationEntities;
-            switch(intent){
-                case "BookDesk":{
-                    // Open BookingDialog
-                    console.log("Intent is Bookdesk");
-                    return await stepContext.beginDialog('bookingDialog', bookingDetails);
-                }
-                case "GetAvailableDesk":{
-                    // Open GetAvailableDeskDialog
-                    console.log("Intent is GetAvailableDesk");
-                    return await stepContext.beginDialog('getDesksDialog', bookingDetails);
-                }
-                default: {
-                    await stepContext.context.sendActivity("Ok, maybe next time 😉");
-                    return await stepContext.next();
-                }  
+    public async luisStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
+        const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
+        const intent = LuisRecognizer.topIntent(luisResult)
+        // Get the text values for all needed entities
+        const bookingSlot = this.luisRecognizer.getBookingSlotEntities(luisResult);
+        const dateTimeEntities = this.luisRecognizer.getDateTimeEntities(luisResult);
+        const deskCodeEntities = this.luisRecognizer.getDeskCodeEntities(luisResult);
+        const deskLocationEntities = this.luisRecognizer.getDeskLocationEntities(luisResult);
+        // Populate the bookingDetails
+        const bookingDetails = new BookingDetails();
+        bookingDetails.bookingSlot = bookingSlot;
+        bookingDetails.dateTime = dateTimeEntities;
+        bookingDetails.deskCode = deskCodeEntities;
+        bookingDetails.deskLocation = deskLocationEntities;
+        switch(intent){
+            case "BookDesk":{
+                // Open BookingDialog
+                console.log("Intent is Bookdesk");
+                return await stepContext.beginDialog('bookingDialog', bookingDetails);
             }
+            case "GetAvailableDesk":{
+                // Open GetAvailableDeskDialog
+                console.log("Intent is GetAvailableDesk");
+                return await stepContext.beginDialog('getDesksDialog', bookingDetails);
+            }
+            case "Help":{
+                // Open GetAvailableDeskDialog
+                console.log("Intent is Help");
+                return await stepContext.beginDialog('helpDialog', bookingDetails);
+            }
+            default: {
+                await stepContext.context.sendActivity("Ok, maybe next time 😉");
+                return await stepContext.endDialog();
+            }  
         }
-
-        return await stepContext.endDialog();
     }
 }
