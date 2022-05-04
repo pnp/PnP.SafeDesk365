@@ -1,7 +1,6 @@
 import { TimexProperty } from '@microsoft/recognizers-text-data-types-timex-expression';
 import { CardFactory, InputHints, MessageFactory, TeamsInfo } from 'botbuilder';
 import {
-    ComponentDialog,
     ConfirmPrompt,
     DialogTurnResult,
     OAuthPrompt,
@@ -12,10 +11,8 @@ import {
 import { BookingDetails } from './bookingDetails';
 import { DateResolverDialog } from './dateResolverDialog';
 import { LogoutDialog } from "./logoutDialog";
-import { SsoOauthPrompt } from "./ssoOauthPrompt";
 import "isomorphic-fetch";
 import { SafeDesk365, Location, DeskAvailability, Booking } from "safedesk365-sdk-jquery";
-const cron = require('node-cron');
 const CONFIRM_PROMPT = 'confirmPrompt';
 const DATE_RESOLVER_DIALOG = 'dateResolverDialog';
 const TEXT_PROMPT = 'textPrompt';
@@ -24,7 +21,6 @@ const BOOKING_DIALOG_ID = "bookingDialog";
 const OAUTH_PROMPT = 'OAuthPrompt';
 var deskcode;
 var bookingResult;
-var code;
 var date;
 var locationId;
 var timeSlot;
@@ -97,7 +93,7 @@ export class BookingDialog extends LogoutDialog  {
     
 
     /**
-     * Complete the interaction and end the dialog.
+     * Complete the interaction and check if all data is here.
      */
     private async choiceStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
         console.log(stepContext.result);
@@ -106,11 +102,14 @@ export class BookingDialog extends LogoutDialog  {
         }
         else {
             await stepContext.context.sendActivity("Ok then let's go through the details step by step...");
-            const bookingDetails = new BookingDetails;
+            const bookingDetails = new BookingDetails();
             return await stepContext.beginDialog('bookingDialog', bookingDetails);
         }
     }
 
+    /**
+     * Authenticate the user via the AAD app reg
+     */
     public async promptStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
         try {
             console.log("Authenticating now...")
@@ -121,6 +120,9 @@ export class BookingDialog extends LogoutDialog  {
         return await stepContext.endDialog();
     }
 
+    /**
+     * Connect to the API and complete the dialog by sending out the booking confirmation
+     */
     private async finalStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
         // get token from prev step (or directly from the prompt itself)
         const tokenResponse = stepContext.result;
@@ -148,6 +150,11 @@ export class BookingDialog extends LogoutDialog  {
             var availabilities = await c.GetUpcomingdeskAvailabilities(bookingDetails.dateTime, bookingDetails.deskLocation);
             console.log(bookingDetails.bookingSlot);
             var userSlot = bookingDetails.bookingSlot.charAt(0).toUpperCase() + bookingDetails.bookingSlot.slice(1);
+            if (typeof availabilities !== "undefined" && availabilities.length == 0){
+                await stepContext.context.sendActivity(`Sorry but the booking was not successful as there is no desk available it seems 😕. Please try booking a desk again with another date or slot...`);
+                const bookingDetails = new BookingDetails();
+                return await stepContext.beginDialog('bookingDialog', bookingDetails);
+            }
             availabilities.forEach(async (element, index) => {
                 let result = await element;
                 if(result.timeSlot == userSlot){
@@ -155,12 +162,11 @@ export class BookingDialog extends LogoutDialog  {
                     const teamsUserInfo = await TeamsInfo.getMember(stepContext.context, stepContext.context.activity.from.id);
                     const user = teamsUserInfo.userPrincipalName;
                     deskcode = result.code as string;
-                    date = result.date;
+                    date = result.date?.getFullYear()+'/'+result.date?.getMonth()+'/'+result.date?.getDate();
                     timeSlot = result.timeSlot;
                     locationId = result.location;
                     imageUrl = result.picture;
                     bookingResult = await c.BookAvailability(result.id as number, user as string);
-                    console.log(bookingResult);
                     resolve(bookingResult);
                 }
             });
@@ -170,7 +176,7 @@ export class BookingDialog extends LogoutDialog  {
     private createDeskHeroCard(deskcode, date, locationId, givenName, imageUrl, timeSlot) {
         return CardFactory.heroCard(
             "Your booking",
-            `Awesome, I booked ${deskcode} on ${date.date} in the ${timeSlot} in ${locationId} for you!\n\nHave a nice day in the office and remember to check-in ${givenName} ✅`,
+            `Awesome, I booked ${deskcode} on ${date} in the ${timeSlot} in ${locationId} for you!\n\nHave a nice day in the office and remember to check-in ${givenName} ✅`,
             CardFactory.images([imageUrl]),
             CardFactory.actions([
                 {
