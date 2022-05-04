@@ -44,7 +44,6 @@ export class BookingDialog extends LogoutDialog  {
             .addDialog(new DateResolverDialog(DATE_RESOLVER_DIALOG))
             .addDialog(new WaterfallDialog(WATERFALL_DIALOG, [
                 this.bookingSlotStep.bind(this),
-                //this.deskCodeStep.bind(this),
                 this.bookingDateStep.bind(this),
                 this.confirmStep.bind(this),
                 this.choiceStep.bind(this),
@@ -66,35 +65,16 @@ export class BookingDialog extends LogoutDialog  {
         } else {
             return await stepContext.next(bookingDetails.bookingSlot);
         }
-;
     }
 
     /**
-     * If an origin city has not been provided, prompt for one.
-     */
-    /*private async deskCodeStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
-        const bookingDetails = stepContext.options as BookingDetails;
-
-        // Capture the response to the previous step's prompt
-        bookingDetails.bookingSlot = stepContext.result;
-        if (!bookingDetails.deskCode) {
-            const messageText = 'What is your preferred desk code?';
-            const msg = MessageFactory.text(messageText, messageText, InputHints.ExpectingInput);
-            return await stepContext.prompt(TEXT_PROMPT, { prompt: msg });
-        } else {
-            return await stepContext.next(bookingDetails.deskCode);
-        }
-    }
-    */
-
-    /**
-     * If a travel date has not been provided, prompt for one.
+     * If a date has not been provided, prompt for one.
      * This will use the DATE_RESOLVER_DIALOG.
      */
     private async bookingDateStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
         const bookingDetails = stepContext.options as BookingDetails;
         // Capture the results of the previous step
-        bookingDetails.deskCode = stepContext.result;
+        bookingDetails.bookingSlot = stepContext.result;
         if (!bookingDetails.dateTime || this.isAmbiguous(bookingDetails.dateTime)) {
             return await stepContext.beginDialog(DATE_RESOLVER_DIALOG, { date: bookingDetails.dateTime });
         } else {
@@ -134,9 +114,9 @@ export class BookingDialog extends LogoutDialog  {
     public async promptStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
         try {
             console.log("Authenticating now...")
-          return await stepContext.beginDialog(OAUTH_PROMPT);
+            return await stepContext.beginDialog(OAUTH_PROMPT);
         } catch (err) {
-          console.error(err);
+            console.error(err);
         }
         return await stepContext.endDialog();
     }
@@ -144,7 +124,6 @@ export class BookingDialog extends LogoutDialog  {
     private async finalStep(stepContext: WaterfallStepContext): Promise<DialogTurnResult> {
         // get token from prev step (or directly from the prompt itself)
         const tokenResponse = stepContext.result;
-        //await stepContext.context.sendActivity(tokenResponse.token);
         const bookingDetails = stepContext.options as BookingDetails;
         console.log("Connecting to the API now...");
         // connect to API
@@ -167,6 +146,7 @@ export class BookingDialog extends LogoutDialog  {
         return new Promise(async function(resolve,reject) {
             var c = new SafeDesk365("https://safedesk365-pro.azurewebsites.net/", tokenResponse.token);
             var availabilities = await c.GetUpcomingdeskAvailabilities(bookingDetails.dateTime, bookingDetails.deskLocation);
+            console.log(bookingDetails.bookingSlot);
             var userSlot = bookingDetails.bookingSlot.charAt(0).toUpperCase() + bookingDetails.bookingSlot.slice(1);
             availabilities.forEach(async (element, index) => {
                 let result = await element;
