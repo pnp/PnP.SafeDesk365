@@ -1,0 +1,84 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.11/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.11",
+  "id": "533471d0-b669-11ec-8b51-adf901e6d2b7",
+  "version": "1.0.1",
+  "packageName": "desky",
+  "developer": {
+    "name": "PnP",
+    "websiteUrl": "https://desky.azurewebsites.net",
+    "privacyUrl": "https://desky.azurewebsites.net/privacy.html",
+    "termsOfUseUrl": "https://desky.azurewebsites.net/tou.html"
+  },
+  "name": {
+    "short": "Desky",
+    "full": "Desky"
+  },
+  "description": {
+    "short": "Your personal Safe Desk 365 chatbot",
+    "full": "Desky is here to assist you checking desk availabilities and booking desks with ease"
+  },
+  "icons": {
+    "outline": "icon-outline.png",
+    "color": "icon-color.png"
+  },
+  "accentColor": "#D85028",
+  "configurableTabs": [],
+  "staticTabs": [
+    {
+      "entityId": "816a8fb0-bfd0-11ec-aa61-6715015b4cc9",
+      "name": "About Desky Bot",
+      "contentUrl": "https://desky.azurewebsites.net/deskyBot/aboutDeskyBot.html",
+      "scopes": [
+        "personal"
+      ]
+    }
+  ],
+  "bots": [
+    {
+      "botId": "d459e7a2-9b2f-4e38-b3c3-c955474e14c8",
+      "needsChannelSelector": true,
+      "isNotificationOnly": false,
+      "scopes": [
+        "personal",
+        "groupchat"
+      ],
+      "commandLists": [
+        {
+          "scopes": [
+            "personal"
+          ],
+          "commands": [
+            {
+              "title": "Help",
+              "description": "Shows help information"
+            },
+            {
+              "title": "Who am I?",
+              "description": "Shows information about your Teams user"
+            },
+            {
+              "title": "Mention me",
+              "description": "Let the bot @mention you"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "connectors": [],
+  "composeExtensions": [],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "token.botframework.com",
+    "desky.azurewebsites.net"
+  ],
+  "webApplicationInfo": {
+    "id": "d459e7a2-9b2f-4e38-b3c3-c955474e14c8",
+    "resource": "api://botid-d459e7a2-9b2f-4e38-b3c3-c955474e14c8"
+  },
+  "showLoadingIndicator": false
+}

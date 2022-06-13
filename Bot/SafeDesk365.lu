@@ -1,0 +1,61 @@
+
+> LUIS application information
+> !# @app.name = SafeDesk365
+> !# @app.versionId = 0.1
+> !# @app.culture = en-us
+> !# @app.luis_schema_version = 7.0.0
+> !# @app.tokenizerVersion = 1.0.0
+
+
+> # Intent definitions
+
+# BookDesk
+- help me book {@DeskCode=desk01} in {@DeskLocation=san diego} on 5/5/2022 in the {@BookingSlot=morning} please
+- i want to book a desk tomorrow {@BookingSlot=morning} in {@DeskLocation=san diego}
+- i want to book {@DeskCode=desk01} tomorrow {@BookingSlot=morning} in the {@DeskLocation=headquarter}
+- please book {@DeskCode=desk01} on 5/5/2022 {@BookingSlot=morning} in {@DeskLocation=seattle}
+- please book {@DeskCode=desk02} in {@DeskLocation=seattle} on 4/4/2022 for the {@BookingSlot=afternoon}
+
+
+# GetAvailableDesk
+- can you tell me if {@DeskCode=desk02} is available on 4/10/2022?
+- i want to know if {@DeskCode=desk02} is free tomorrow {@BookingSlot=morning} in the {@DeskLocation=headquarter}
+- is {@DeskCode=desk01} free tomorrow {@BookingSlot=afternoon} in the {@DeskLocation=headquarter}?
+- is {@BookingSlot=desk01} free tomorrow {@BookingSlot=afternoon}?
+- is the {@DeskCode=desk01} available on 4/4/2022 in the {@BookingSlot=morning}?
+
+
+# Help
+- can you help me?
+- get help
+- help
+- i need help
+- please assist
+- please help
+
+
+# None
+
+
+> # Entity definitions
+
+@ ml BookingSlot
+
+@ ml DeskCode
+
+@ ml DeskLocation
+
+
+> # PREBUILT Entity definitions
+
+@ prebuilt datetimeV2
+
+
+> # Phrase list definitions
+
+
+> # List entities
+
+> # RegEx entities
+
+
